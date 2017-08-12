@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/GB Emulator/GB Emulator.sln
+/GB Emulator/GB Emulator/GB Emulator.vcxproj.filters
+/GB Emulator/GB Emulator/GB Emulator.vcxproj
+/GB Emulator/.vs/GB Emulator/v15
+/GB Emulator/GB Emulator.sln
+/GB Emulator/GB Emulator/GB Emulator.vcxproj.filters
+/GB Emulator/GB Emulator/GB Emulator.vcxproj
