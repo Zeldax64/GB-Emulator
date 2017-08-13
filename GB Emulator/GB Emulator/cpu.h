@@ -93,6 +93,8 @@ struct cpuregisters cpu;
 
 /*----- Load Instructions -----*/
 /* 8-Bit */
+/*
+Old implementation with defines. I'm intending to use functions instead.
 #define LDrr(reg1, reg2) (reg1) = (reg2); cpu.m++; cpu.pc++							// LD r, r'
 #define LDrn(reg)	     (reg) = rdByte(++cpu.pc); cpu.m += 2; cpu.pc++				// LD r,n
 #define LDrHL(reg)		 (reg) = rdByte(cpu.hl); cpu.m += 2; cpu.pc++				// LD r,(HL)
@@ -112,14 +114,31 @@ struct cpuregisters cpu;
 #define LDDEA			 wrByte(cpu.de, cpu.a); cpu.m += 2; cpu.pc++				// LD (DE), A
 #define LDHLIA			 wrByte(cpu.hl, cpu.a); cpu.hl++; cpu.m += 2; cpu.pc++      // LD (HLI), A
 #define LDHLDA			 wrByte(cpu.hl, cpu.a); cpu.hl--; cpu.m += 2; cpu.pc++	    // LD (HLD), A
-
+*/
+void LDrHL(uint8_t *reg);
+void LDHLr(uint8_t *reg);
+void LDHLn();
+void LDABC();
+void LDADE();
+void LDAC();
+void LDCA();
+void LDAn();
+void LDnA();
+void LDAnn();
+void LDnnA();
+void LDAHLI();
+void LDAHLD();
+void LDBCA();
+void LDDEA();
+void LDHLIA();
+void LDHLDA();
 /* 16-Bit */
-#define LDddnn(reg, pc)		 (reg) = rdWord(pc++); cpu.m += 3; cpu.pc += 2			// LD dd, nn
-#define LDSPHL				 cpu.sp = cpu.hl; cpu.m +=2 ; cpu.pc++					// LD SP, HL
-#define PUSHqq(reg1, reg2)	 wrByte(cpu.sp--, reg1); wrByte(cpu.sp--, reg2); cpu.m += 4; cpu.pc++ // PUSH qq
+void LDddnn(uint16_t *reg);
+void LDSPHL();
+void PUSHqq(uint16_t *reg1, uint16_t *reg2);
 // NOTA
 // Different : rdWord is used instead of rdByte.
-#define POPqq(reg)			 reg = rdWord(cpu.sp); cpu.sp += 2; cpu.m += 3; cpu.pc++ // POP qq
+void POPqq(uint16_t *reg);
 // NOTA
 // Different
 void LDHLSPe();
@@ -226,6 +245,16 @@ void CALLZnn();
 void CALLNCnn();
 void CALLCnn();
 void RET();
+void RETI();
+void RETNZ();
+void RETZ();
+void RETNC();
+void RETC();
+void RST(uint8_t t);
+void CPL();
+void NOP();
+void HALT();
 
+/*----- General-Purpose Arithmetic Operations and CPU Control Instructions -----*/
 
 #endif

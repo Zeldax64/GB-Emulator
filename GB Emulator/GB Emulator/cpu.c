@@ -49,6 +49,38 @@ void flagZ16(uint16_t val) {
 /*----- Instructions -----*/
 
 /*----- Load Instruction -----*/
+/* 8-Bit */
+void LDrr(uint8_t *reg1, uint8_t *reg2) { *(reg1) = *(reg2); cpu.pc++; cpu.m++; }		  // LD r, r'
+void LDrn(uint8_t *reg) { *(reg) = rdByte(++cpu.pc); cpu.pc++; cpu.m += 2; }			  // LD r,n
+void LDrHL(uint8_t *reg) { *(reg) = rdByte(cpu.hl); cpu.pc++; cpu.m += 2; }			  // LD r,(HL)
+void LDHLr(uint8_t *reg) { wrByte(cpu.hl, *(reg)); cpu.pc++; cpu.m += 2; }				  // LD (HL), r
+void LDHLn() { wrByte(cpu.hl, rdByte(++cpu.pc)); cpu.pc++; cpu.m += 3; }	  // LD (HL), n
+void LDABC() { cpu.a = rdByte(cpu.bc); cpu.pc++; cpu.m += 2; }			  // LD A, (BC)
+void LDADE() { cpu.a = rdByte(cpu.de); cpu.pc++;	cpu.m += 2; }			  // LD A, (DE)
+void LDAC() { cpu.a = rdByte(cpu.c + 0xFF00); cpu.pc++; cpu.m += 2; }	  // LD A, (C)
+void LDCA() { wrByte(cpu.c + 0xFF00, cpu.a); cpu.pc++; cpu.m += 2; }		  // LD (C), A
+void LDAn() { cpu.a = rdByte(++cpu.pc); cpu.pc++; cpu.m += 3; }			  // LD A, (n)
+void LDnA() { wrByte(++cpu.pc, cpu.a); cpu.pc++; cpu.m += 3; }			  // LD (n), A
+void LDAnn() { cpu.a = rdByte(rdWord(++cpu.pc)); cpu.pc += 2; cpu.m += 4; } // LD A, (nn)
+void LDnnA() { wrByte(rdWord(++cpu.pc), cpu.a); cpu.pc += 2; cpu.m += 4; }  // LD (nn), A
+void LDAHLI() { cpu.a = rdByte(cpu.hl); cpu.hl++; cpu.pc++; cpu.m += 2; }	  // LD A, (HLI)
+void LDAHLD() { cpu.a = rdByte(cpu.hl); cpu.hl--; cpu.pc++; cpu.m += 2; }	  // LD A, (HLD)
+void LDBCA() { wrByte(cpu.bc, cpu.a); cpu.pc++; cpu.m += 2; }				  // LD (BC), A
+void LDDEA() { wrByte(cpu.de, cpu.a); cpu.pc++; cpu.m += 2; }				  // LD (DE), A
+void LDHLIA() { wrByte(cpu.hl, cpu.a); cpu.hl++; cpu.pc++; cpu.m += 2; }     // LD (HLI), A
+void LDHLDA() { wrByte(cpu.hl, cpu.a); cpu.hl--; cpu.pc++; cpu.m += 2; }	  // LD (HLD), A
+
+/*
+	Stopped here!
+*/
+/* 16-Bit */
+void LDddnn(uint16_t *reg) { *(reg) = rdWord(cpu.pc++); cpu.m += 3; cpu.pc += 2; }			// LD dd, nn
+void LDSPHL() {cpu.sp = cpu.hl; cpu.m +=2 ; cpu.pc++					// LD SP, HL
+void PUSHqq(uint16_t *reg1, uint16_t * reg2) { wrByte(cpu.sp--, reg1); wrByte(cpu.sp--, reg2); cpu.m += 4; cpu.pc++ // PUSH qq
+// NOTA
+// Different : rdWord is used instead of rdByte.
+void POPqq(reg)			 reg = rdWord(cpu.sp); cpu.sp += 2; cpu.m += 3; cpu.pc++ // POP qq
+
 void LDHLSPe() {  // LDHL SP, e
 	int8_t e = (int8_t)rdByte(++cpu.pc);
 	cpu.hl = cpu.sp + e;
@@ -1053,3 +1085,145 @@ void RET() {
 void RETI() {
 
 }
+
+// RETcc functions. Each one represents a possibility to cc
+void RETNZ() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc++;
+		cpu.m += 2;
+	}
+	else {
+		cpu.pc = rdWord(cpu.sp);
+		cpu.m += 5;
+	}
+}
+
+void RETZ() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc = rdWord(cpu.sp);
+		cpu.m += 5;
+	}
+	else {
+		cpu.pc++;
+		cpu.m += 2;
+	}
+}
+
+void RETNC() {
+	if (cpu.f & FLAGC) {
+		cpu.pc++;
+		cpu.m += 2;
+	}
+	else {
+		cpu.pc = rdWord(cpu.sp);
+		cpu.m += 5;
+	}
+}
+
+void RETC() {
+	if (cpu.f & FLAGC) {
+		cpu.pc = rdWord(cpu.sp);
+		cpu.m += 5;
+	}
+	else {
+		cpu.pc++;
+		cpu.m += 2;
+	}
+}
+
+void RST(uint8_t t) {
+	cpu.sp -= 2;
+	wrWord(cpu.sp, cpu.pc + 1);
+
+	cpu.pc = t;
+	cpu.m += 4;
+}
+
+/*----- General-Purpose Arithmetic Operations and CPU Control Instructions -----*/
+/*
+	NOTA
+	Different implementation!
+	Source: https://stackoverflow.com/questions/8119577/z80-daa-instruction
+	Worth viewing: http://forums.nesdev.com/viewtopic.php?t=9088
+*/
+void DAA() {
+	uint8_t a = cpu.a;
+	CLEAR_H;
+
+	if (cpu.f & FLAGC) {
+		if (cpu.f & FLAGH || (a & 0x0F) > 0x9) {
+			cpu.a += 6;
+		}
+		if (cpu.f & FLAGC || (a & 0xF0) > 0x90) {
+			cpu.a += 60;
+			cpu.f &= FLAGC;
+		}
+	}
+	else {
+		if (cpu.f & FLAGH || (a & 0x0F) > 0x9) {
+			cpu.a -= 6;
+		}
+		if (cpu.f & FLAGC || (a & 0xF0) > 0x90) {
+			cpu.a -= 60;
+			cpu.f &= FLAGC;
+		}
+	}
+	if (cpu.a == 0) cpu.f &= FLAGZ;
+
+	cpu.pc++;
+	cpu.m++;
+}
+
+void CPL() {
+	cpu.f &= FLAGH;
+	cpu.f &= FLAGN;
+	cpu.a = ~cpu.a;
+
+	cpu.pc++;
+	cpu.m++;
+}
+
+void NOP() {
+	cpu.pc++;
+	cpu.m++;
+}
+
+void CCF() {
+	cpu.f ^= FLAGC;
+	CLEAR_H;
+	CLEAR_N;
+
+	cpu.pc++;
+	cpu.m++;
+}
+
+void SCF() {
+	cpu.f &= FLAGC;
+	CLEAR_H;
+	CLEAR_N;
+
+	cpu.pc++;
+	cpu.m++;
+}
+
+void DI() {
+
+}
+
+void EI() {
+
+}
+
+void HALT() {
+
+}
+
+/*
+NOTA
+Not yet implemented instructions:
+DI
+EI
+HALT
+STOP
+RETI
+*/
