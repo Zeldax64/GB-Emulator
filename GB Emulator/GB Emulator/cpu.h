@@ -202,10 +202,30 @@ void RESHL(uint8_t bit);
 
 /*----- Jump Instructions -----*/
 void JPnn();
-void JPccnn(uint8_t cc);
+// void JPccnn(uint8_t cc);
+void JPNZnn();
+void JPZnn();
+void JPNCnn();
+void JPCnn();
 void JRe();
-void JRcce(uint8_t cc);
+//void JRcce(uint8_t cc);
+/*
+  Nota
+  Watch all JRcce functions because e can be from -127 to 129.
+*/
+void JRNZe();
+void JRZe();
+void JRNCe();
+void JRCe();
 void JPHL();
+
+/*----- Call and Return Instructions -----*/
+void CALLnn();
+void CALLNZnn();
+void CALLZnn();
+void CALLNCnn();
+void CALLCnn();
+void RET();
 
 
 #endif

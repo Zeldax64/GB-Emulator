@@ -798,6 +798,9 @@ void JPnn() { // JP nn
 	cpu.m += 4;
 }
 
+/*
+NOTA
+Useless
 void JPccnn(uint8_t cc) { // JP cc, nn
 	switch (cc) {
 	case 0b00:	// NZ -> Flag Z = 0
@@ -825,6 +828,52 @@ void JPccnn(uint8_t cc) { // JP cc, nn
 		cpu.m += 3;
 	}
 }
+*/
+
+// JPccnn functions. Each one represents a possibility to cc
+void JPNZnn() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+	else {
+		cpu.pc = rdWord(cpu.pc + 1);
+		cpu.m += 4;
+	}
+}
+
+void JPZnn() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc = rdWord(cpu.pc + 1);
+		cpu.m += 4;
+	}
+	else {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+}
+
+void JPNCnn() {
+	if (cpu.f & FLAGC) {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+	else {
+		cpu.pc = rdWord(cpu.pc + 1);
+		cpu.m += 4;
+	}
+}
+
+void JPCnn() {
+	if (cpu.f & FLAGC) {
+		cpu.pc = rdWord(cpu.pc + 1);
+		cpu.m += 4;
+	}
+	else {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+}
 
 
 /*
@@ -834,12 +883,14 @@ This function must be watched!
 */
 
 void JRe() {
-	uint8_t e = rdByte(++cpu.pc);
+	int8_t e = rdByte(++cpu.pc);
 
 	cpu.pc += e;
 
 	cpu.m += 3;
 }
+
+/*
 void JRcce(uint8_t cc) { // JR cc, e
 	uint8_t e = rdByte(++cpu.pc);
 	switch (cc) {
@@ -868,8 +919,137 @@ void JRcce(uint8_t cc) { // JR cc, e
 		cpu.m += 2;
 	}
 }
+*/
+
+// JRcce functions. Each one represents a possibility to cc
+void JRNZe() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc += 2;
+		cpu.m += 2;
+	}
+	else {
+		cpu.pc += (int8_t) rdByte(cpu.pc + 1);
+		cpu.m += 3;
+	}
+}
+
+void JRZe() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc += (int8_t)rdByte(cpu.pc + 1);
+		cpu.m += 3;
+	}
+	else {
+		cpu.pc += 2;
+		cpu.m += 2;
+	}
+}
+
+void JRNCe() {
+	if (cpu.f & FLAGC) {
+		cpu.pc += 2;
+		cpu.m += 2;
+	}
+	else {
+		cpu.pc += (int8_t)rdWord(cpu.pc + 1);
+		cpu.m += 3;
+	}
+}
+	
+
+void JRCe() {
+	if (cpu.f & FLAGC) {
+		cpu.pc += (int8_t)rdWord(cpu.pc + 1);
+		cpu.m += 3;
+	}
+	else {
+		cpu.pc += 2;
+		cpu.m += 2;
+	}
+}
 
 void JPHL() { // JP (HL)
 	cpu.pc = cpu.hl;
 	cpu.m += 1;
+}
+
+/*----- Call and Return Instructions -----*/
+void CALLnn() {
+	cpu.sp -= 2;
+	wrWord(cpu.sp, cpu.pc + 3);
+	cpu.pc = rdWord(cpu.pc + 1);
+
+	cpu.m += 6;
+}
+
+// CALLccnn functions. Each one represents a possibility to cc
+void CALLNZnn() {
+	if (cpu.f & FLAGZ) {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+	else {
+		cpu.sp -= 2;
+		wrWord(cpu.sp, cpu.pc + 3);
+		cpu.pc = rdWord(cpu.pc + 1);
+
+		cpu.m += 6;
+	}
+}
+
+void CALLZnn() {
+	if (cpu.f & FLAGZ) {
+		cpu.sp -= 2;
+		wrWord(cpu.sp, cpu.pc + 3);
+		cpu.pc = rdWord(cpu.pc + 1);
+
+		cpu.m += 6;
+	}
+	else {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+}
+
+void CALLNCnn() {
+	if (cpu.f & FLAGC) {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+	else {
+		cpu.sp -= 2;
+		wrWord(cpu.sp, cpu.pc + 3);
+		cpu.pc = rdWord(cpu.pc + 1);
+
+		cpu.m += 6;
+	}
+}
+
+void CALLCnn() {
+	if (cpu.f & FLAGC) {
+		cpu.sp -= 2;
+		wrWord(cpu.sp, cpu.pc + 3);
+		cpu.pc = rdWord(cpu.pc + 1);
+
+		cpu.m += 6;
+	}
+	else {
+		cpu.pc += 3;
+		cpu.m += 3;
+	}
+}
+
+void RET() {
+	cpu.pc = rdWord(cpu.sp);
+	cpu.sp += 2;
+
+	cpu.m += 4;
+}
+
+/*
+	NOTA
+	This function works with interruptions which are
+	not yet implemented.
+*/
+void RETI() {
+
 }
