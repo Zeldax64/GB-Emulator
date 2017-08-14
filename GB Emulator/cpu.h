@@ -93,30 +93,10 @@ struct cpuregisters cpu;
 
 /*----- Load Instructions -----*/
 /* 8-Bit */
-/*
-Old implementation with defines. I'm intending to use functions instead.
-#define LDrr(reg1, reg2) (reg1) = (reg2); cpu.m++; cpu.pc++							// LD r, r'
-#define LDrn(reg)	     (reg) = rdByte(++cpu.pc); cpu.m += 2; cpu.pc++				// LD r,n
-#define LDrHL(reg)		 (reg) = rdByte(cpu.hl); cpu.m += 2; cpu.pc++				// LD r,(HL)
-#define LDHLr(reg)	     wrByte(cpu.hl, (reg)); cpu.m += 2; cpu.pc++				// LD (HL), r
-#define LDHLn		     wrByte(cpu.hl, rdByte(++cpu.pc)); cpu.m += 3; cpu.pc++		// LD (HL), n
-#define LDABC			 cpu.a = rdByte(cpu.bc); cpu.m += 2; cpu.pc++				// LD A, (BC)
-#define LDADE			 cpu.a = rdByte(cpu.de); cpu.m += 2; cpu.pc++				// LD A, (DE)
-#define LDAC			 cpu.a = rdByte(cpu.c + 0xFF00); cpu.m += 2; cpu.pc++		// LD A, (C)
-#define LDCA			 wrByte(cpu.c + 0xFF00, cpu.a); cpu.m += 2; cpu.pc++		// LD (C), A
-#define LDAn			 cpu.a = rdByte(++cpu.pc); cpu.m +=3; cpu.pc++				// LD A, (n)
-#define LDnA			 wrByte(++cpu.pc, cpu.a); cpu.m +=3; cpu.pc++				// LD (n), A
-#define LDAnn			 cpu.a = rdByte(rdWord(++cpu.pc)); cpu.m += 4; cpu.pc += 2  // LD A, (nn)
-#define LDnnA			 wrByte(rdWord(++cpu.pc), cpu.a); cpu.m += 4; cpu.pc += 2   // LD (nn), A
-#define LDAHLI			 cpu.a = rdByte(cpu.hl); cpu.hl++; cpu.m += 2; cpu.pc++		// LD A, (HLI)
-#define LDAHLD			 cpu.a = rdByte(cpu.hl); cpu.hl--; cpu.m += 2; cpu.pc++		// LD A, (HLD)
-#define LDBCA			 wrByte(cpu.bc, cpu.a); cpu.m += 2; cpu.pc++				// LD (BC), A
-#define LDDEA			 wrByte(cpu.de, cpu.a); cpu.m += 2; cpu.pc++				// LD (DE), A
-#define LDHLIA			 wrByte(cpu.hl, cpu.a); cpu.hl++; cpu.m += 2; cpu.pc++      // LD (HLI), A
-#define LDHLDA			 wrByte(cpu.hl, cpu.a); cpu.hl--; cpu.m += 2; cpu.pc++	    // LD (HLD), A
-*/
+void LDrr(uint8_t * reg1, uint8_t * reg2);
+void LDrn(uint8_t * reg);
 void LDrHL(uint8_t *reg);
-void LDHLr(uint8_t *reg);
+void LDHLr(uint8_t reg);
 void LDHLn();
 void LDABC();
 void LDADE();
@@ -132,13 +112,14 @@ void LDBCA();
 void LDDEA();
 void LDHLIA();
 void LDHLDA();
+
 /* 16-Bit */
 void LDddnn(uint16_t *reg);
 void LDSPHL();
-void PUSHqq(uint16_t *reg1, uint16_t *reg2);
+void PUSHqq(uint16_t reg);
 // NOTA
 // Different : rdWord is used instead of rdByte.
-void POPqq(uint16_t *reg);
+void POPqq(uint16_t reg);
 // NOTA
 // Different
 void LDHLSPe();

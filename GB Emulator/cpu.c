@@ -50,36 +50,33 @@ void flagZ16(uint16_t val) {
 
 /*----- Load Instruction -----*/
 /* 8-Bit */
-void LDrr(uint8_t *reg1, uint8_t *reg2) { *(reg1) = *(reg2); cpu.pc++; cpu.m++; }		  // LD r, r'
-void LDrn(uint8_t *reg) { *(reg) = rdByte(++cpu.pc); cpu.pc++; cpu.m += 2; }			  // LD r,n
-void LDrHL(uint8_t *reg) { *(reg) = rdByte(cpu.hl); cpu.pc++; cpu.m += 2; }			  // LD r,(HL)
-void LDHLr(uint8_t *reg) { wrByte(cpu.hl, *(reg)); cpu.pc++; cpu.m += 2; }				  // LD (HL), r
-void LDHLn() { wrByte(cpu.hl, rdByte(++cpu.pc)); cpu.pc++; cpu.m += 3; }	  // LD (HL), n
-void LDABC() { cpu.a = rdByte(cpu.bc); cpu.pc++; cpu.m += 2; }			  // LD A, (BC)
-void LDADE() { cpu.a = rdByte(cpu.de); cpu.pc++;	cpu.m += 2; }			  // LD A, (DE)
-void LDAC() { cpu.a = rdByte(cpu.c + 0xFF00); cpu.pc++; cpu.m += 2; }	  // LD A, (C)
-void LDCA() { wrByte(cpu.c + 0xFF00, cpu.a); cpu.pc++; cpu.m += 2; }		  // LD (C), A
-void LDAn() { cpu.a = rdByte(++cpu.pc); cpu.pc++; cpu.m += 3; }			  // LD A, (n)
-void LDnA() { wrByte(++cpu.pc, cpu.a); cpu.pc++; cpu.m += 3; }			  // LD (n), A
-void LDAnn() { cpu.a = rdByte(rdWord(++cpu.pc)); cpu.pc += 2; cpu.m += 4; } // LD A, (nn)
-void LDnnA() { wrByte(rdWord(++cpu.pc), cpu.a); cpu.pc += 2; cpu.m += 4; }  // LD (nn), A
-void LDAHLI() { cpu.a = rdByte(cpu.hl); cpu.hl++; cpu.pc++; cpu.m += 2; }	  // LD A, (HLI)
-void LDAHLD() { cpu.a = rdByte(cpu.hl); cpu.hl--; cpu.pc++; cpu.m += 2; }	  // LD A, (HLD)
-void LDBCA() { wrByte(cpu.bc, cpu.a); cpu.pc++; cpu.m += 2; }				  // LD (BC), A
-void LDDEA() { wrByte(cpu.de, cpu.a); cpu.pc++; cpu.m += 2; }				  // LD (DE), A
-void LDHLIA() { wrByte(cpu.hl, cpu.a); cpu.hl++; cpu.pc++; cpu.m += 2; }     // LD (HLI), A
-void LDHLDA() { wrByte(cpu.hl, cpu.a); cpu.hl--; cpu.pc++; cpu.m += 2; }	  // LD (HLD), A
+void LDrr(uint8_t *reg1, uint8_t *reg2) { *(reg1) = *(reg2); cpu.pc++; cpu.m++; }  // LD r, r'
+void LDrn(uint8_t *reg) { *(reg) = rdByte(++cpu.pc); cpu.pc++; cpu.m += 2; }	   // LD r,n
+void LDrHL(uint8_t *reg) { *(reg) = rdByte(cpu.hl); cpu.pc++; cpu.m += 2; }		   // LD r,(HL)
+void LDHLr(uint8_t reg) { wrByte(cpu.hl, reg); cpu.pc++; cpu.m += 2; }			   // LD (HL), r
+void LDHLn() { wrByte(cpu.hl, rdByte(++cpu.pc)); cpu.pc++; cpu.m += 3; }		   // LD (HL), n
+void LDABC() { cpu.a = rdByte(cpu.bc); cpu.pc++; cpu.m += 2; }					   // LD A, (BC)
+void LDADE() { cpu.a = rdByte(cpu.de); cpu.pc++;	cpu.m += 2; }				   // LD A, (DE)
+void LDAC() { cpu.a = rdByte(cpu.c + 0xFF00); cpu.pc++; cpu.m += 2; }			   // LD A, (C)
+void LDCA() { wrByte(cpu.c + 0xFF00, cpu.a); cpu.pc++; cpu.m += 2; }			   // LD (C), A
+void LDAn() { cpu.a = rdByte(++cpu.pc); cpu.pc++; cpu.m += 3; }					   // LD A, (n)
+void LDnA() { wrByte(++cpu.pc, cpu.a); cpu.pc++; cpu.m += 3; }					   // LD (n), A
+void LDAnn() { cpu.a = rdByte(rdWord(++cpu.pc)); cpu.pc += 2; cpu.m += 4; }		   // LD A, (nn)
+void LDnnA() { wrByte(rdWord(++cpu.pc), cpu.a); cpu.pc += 2; cpu.m += 4; }		   // LD (nn), A
+void LDAHLI() { cpu.a = rdByte(cpu.hl); cpu.hl++; cpu.pc++; cpu.m += 2; }		   // LD A, (HLI)
+void LDAHLD() { cpu.a = rdByte(cpu.hl); cpu.hl--; cpu.pc++; cpu.m += 2; }		   // LD A, (HLD)
+void LDBCA() { wrByte(cpu.bc, cpu.a); cpu.pc++; cpu.m += 2; }					   // LD (BC), A
+void LDDEA() { wrByte(cpu.de, cpu.a); cpu.pc++; cpu.m += 2; }					   // LD (DE), A
+void LDHLIA() { wrByte(cpu.hl, cpu.a); cpu.hl++; cpu.pc++; cpu.m += 2; }		   // LD (HLI), A
+void LDHLDA() { wrByte(cpu.hl, cpu.a); cpu.hl--; cpu.pc++; cpu.m += 2; }		   // LD (HLD), A
 
-/*
-	Stopped here!
-*/
 /* 16-Bit */
-void LDddnn(uint16_t *reg) { *(reg) = rdWord(cpu.pc++); cpu.m += 3; cpu.pc += 2; }			// LD dd, nn
-void LDSPHL() {cpu.sp = cpu.hl; cpu.m +=2 ; cpu.pc++					// LD SP, HL
-void PUSHqq(uint16_t *reg1, uint16_t * reg2) { wrByte(cpu.sp--, reg1); wrByte(cpu.sp--, reg2); cpu.m += 4; cpu.pc++ // PUSH qq
+void LDddnn(uint16_t *reg) { *(reg) = rdWord(cpu.pc++); cpu.pc += 2; cpu.m += 3;}	  // LD dd, nn
+void LDSPHL() { cpu.sp = cpu.hl; cpu.pc++; cpu.m += 2; }							  // LD SP, HL
+void PUSHqq(uint16_t reg) { cpu.sp -= 2; wrWord(cpu.sp, reg); cpu.pc++; cpu.m += 4; } // PUSH qq
 // NOTA
 // Different : rdWord is used instead of rdByte.
-void POPqq(reg)			 reg = rdWord(cpu.sp); cpu.sp += 2; cpu.m += 3; cpu.pc++ // POP qq
+void POPqq(uint16_t reg) { reg = rdWord(cpu.sp); cpu.sp += 2; cpu.pc++; cpu.m += 3; } // POP qq
 
 void LDHLSPe() {  // LDHL SP, e
 	int8_t e = (int8_t)rdByte(++cpu.pc);

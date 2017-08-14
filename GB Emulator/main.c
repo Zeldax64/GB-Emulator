@@ -8,16 +8,12 @@
 ///////////////////////////////////
 /*----- GB Emulator Project -----*/
 ///////////////////////////////////
+/*----- Defines -----*/
+#define GB_CLOCK 4194304
+#define MAXCYCLES 69905 // GB_CLOCK / Frame Rate (60Hz)
 
-void cpu_Cycle() {
-	uint8_t opcode = rdByte(cpu.pc);
-	
 
-	switch (opcode) {
-		case 0x00:  // NOP
-			break;
-	}
-}
+void emulateCycle();
 
 void printFlag() {
 	printf("FlagZ: %d\n", (cpu.f & FLAGZ ? 1 : 0));
@@ -43,3 +39,4 @@ void main() {
 	printf("%d\n", cpu.a);
 	*/
 }
+
