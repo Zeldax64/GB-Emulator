@@ -1,0 +1,6 @@
+﻿  main.c
+c:\users\caiox\documents\git\gb-emulator\gb emulator\main.c(32): warning C4476: 'printf': tipo desconhecido de caractere de campo 'R' no especificador de formato
+  gpu.c
+  Gerando Código...
+  GB Emulator.vcxproj -> C:\Users\caiox\Documents\git\GB-Emulator\GB Emulator\Debug\GB Emulator.exe
+  GB Emulator.vcxproj -> C:\Users\caiox\Documents\git\GB-Emulator\GB Emulator\Debug\GB Emulator.pdb (Partial PDB)
