@@ -130,9 +130,9 @@ uint8_t rdByte(uint16_t addr) {
 			}
 			else {
 				// I/O control handling
+				//return ioport[addr & ]
 				return 0;
 			}
-
 		}
 	}
 }

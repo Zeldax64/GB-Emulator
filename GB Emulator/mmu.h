@@ -33,13 +33,15 @@ typedef struct{
 	uint8_t carttype;
 	uint8_t ROMbank;
 
-	uint8_t bios[0x100]; // BIOS
-	uint8_t rom[0x100];	// ROM
-	uint8_t wram[0x100]; // Working RAM
-	uint8_t eram[0x100]; // External RAM (Cartridge)
-	uint8_t zram[0x100]; // Zero page RAM
-	uint8_t vram[0x100]; // Video RAM - GPU?
-	uint8_t oam[0x100];	// OAM RAM - GPU?
+	uint8_t bios[0x100];   // BIOS
+	uint8_t rom[0x8000];   // ROM
+	uint8_t wram[0x2000];  // Working RAM
+	uint8_t eram[0x2000];  // External RAM (Cartridge)
+	uint8_t zram[0x7F];    // Zero page RAM
+	uint8_t vram[0x2000];  // Video RAM - GPU?
+	uint8_t oam[0xA0];	   // OAM RAM - GPU?
+	uint8_t ioports[0x4C]; // I/O Ports
+
 
 	uint8_t romoffset;
 	uint8_t ramoffset;

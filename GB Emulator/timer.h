@@ -4,10 +4,30 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "cpu.h"
+#include "mmu.h"
 
-void inc();
-void check();
+/*----- Defines -----*/
+#define DIVR 0xFF04 // Divider Register
+#define TIMA 0xFF05 // Timer Counter: 8-byte register
+#define TMA 0xFF06  // Timer modulo
+#define TMC 0xFF07  // Timer Controller: 3-bit register
+
+/*----- Function prototypes -----*/
+void TIM_init();
+void TIM_updateTimers(int16_t cycles);
+void TIM_updateDIVR(int16_t cycles);
+uint8_t TIM_getClockFreq();
+uint8_t TIM_setClockFreq();
+
+/*----- Timer struct -----*/
+typedef struct gbtimer {
+	int16_t timer_counter;
+	int16_t divider_counter;
+	uint8_t *divr;
+	uint8_t *tima;
+	uint8_t *tma;
+	uint8_t *tmc;
+}GB_TIM;
 
 #endif
 

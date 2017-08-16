@@ -92,8 +92,6 @@ struct cpuregisters cpu;
 /*----- Instructions -----*/
 ////////////////////////////
 
-
-
 /*----- Load Instructions -----*/
 /* 8-Bit */
 void LDrr(uint8_t * reg1, uint8_t * reg2);

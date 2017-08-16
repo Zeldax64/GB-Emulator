@@ -2,113 +2,64 @@
 
 /*
 	There are 2 counters: TIMA and DIVR
-	DIVR works indepedent of the running program.
+	DIVR (Clock divider) works indepedent of the running program.
 	TIMA must be set by the program
 */
 
-#define DIVR 0xFF0r // Divider Register
-#define TIMA 0xFF05 // Timer Counter: 8-byte register
-#define TMA 0xFF06  // Timer modulo
-#define TMC 0xFF07  // Timer Controller: 3-bit register
-
-#define CLOCKSPEED 4194304
-#define MCYCLESPEED 1048576
+/*
+	NOTA
+	I'm working with machine cycles instead of clock cycles. Thus, all counter values are divided by 4
+*/
 
 /*---- Variables -----*/
-uint16_t clkmain = 0;
-uint16_t clksub = 0;
-uint16_t clkdiv = 0;
-uint16_t regdiv = 0;
-uint16_t regtima = 0;
-uint16_t regtma = 0;
-uint16_t regtac = 0;
+static GB_TIM tim;
 
-void inc() {
-	// Increment by the last opcode's time
-	clksub += cpu.m;
-
-	// No opcode takes longer than 4M-times,
-	// so we need only check for overflow once
-	/*
-		There are some instructions which have more than 4M-times:
-		LNnnSP: 5
-		CALLnn: 6
-		CALLcc: 6
-		RETcc:  5
-
-	*/
-	if (clksub >= 4) {
-		clkmain++;	 // Increments TIMA (Timer counter)
-		clksub -= 4; // Decrements clksub (Timer Clock)
-
-		// The DIV register increments at 1/16th
-		// the rate, so keep a count of this
-		clkdiv++;	// Increments Divider Counter's clock (Divider is a indepent timer)
-		if (clkdiv == 16) {
-			/*
-				if regdiv is a uint8_t this code maybe be used
-				regdiv++;
-				clkdiv = 0;
-			*/
-			regdiv = (regdiv + 1) & 255; 
-			clkdiv = 0;
-		}
-	}
-
-	// Check whether a step needs to be made in the timer 
-	check();
+/*----- Functions -----*/
+void TIM_init() {
+	// To do
+	// Init tim variables with MMU's ioport values
 }
 
-uint8_t threshold;
+void TIM_updateTimers(int16_t cycles) {
+	TIM_updateDIVR(cycles); // Update Clock divider register
 
-/*
-	A division is applyed to threshold and it's checked
-	if clkmain is >= threshold.
-*/
-void check() {
-	if (regtac & 4) {	//regtac & 0b100: check wether timer is on
-		switch (regtac & 3) {
-			case 0: threshold = 64; break; // 4k
-			case 1: threshold = 1;  break; // 256k
-			case 2: threshold = 4;  break; // 64k
-			case 3: threshold = 16; break; // 16k
-		}
-		if (clkmain >= threshold) {
-			step();
-		}
-	}
-}
-
-
-/*
-int timercounter;
-uint32_t clockfrequency;
-
-bool isClockEnabled() {
-	return rdByte(TMC) & 0x2 ? true : false;
-}
-
-void updateTimer(int cycles) {
-	doDividerRegister(cycles);
-	// The clock must be enabled to update the clock
-
-	if (isClockEnabled()) {
-		timercounter -= cycles;
-		// Enough cpuclock cycles have happened to update the tiemr
-		if (timercounter <= 0) {
-			//reset timerTracer to the correct value
-			setClockFreq();
-			// Timer about to overflow
-
-			if (rdByte(TIMA) == 255) {
-				wrByte(TIMA, rdByte(TMA));
-				requestInterupt(2);
+	if (*tim.tmc & 0x4) { // Is counter on?
+		tim.timer_counter -= cycles; 
+		if (tim.timer_counter <= 0) {
+			TIM_setClockFreq(); // Reset timer_counter
+			if (*tim.tima == 255) { // If overflow
+				*tim.tima = *tim.tma; // Timer register = timer modulo 
+				//requestInterrupt(2);
 			}
-			else{
-				wrByte(TIMA, rdByte(TIMA) + 1);
+			else {
+				*tim.tima++; // Increment timer register
 			}
 		}
 	}
 }
 
-*/
+void TIM_updateDIVR(int16_t cycles) {
+	tim.divider_counter += cycles;
+	if (tim.divider_counter >= 64) {
+		/*
+			NOTA
+			I'm using -= instead of = and 64 instead of 255 (machine cycle instead of clk cycle) 
+		*/
+		tim.divider_counter -= 64;
+		*tim.divr++;
+	}
+}
+
+uint8_t TIM_getClockFreq() {
+	return *tim.tmc & 0x3;
+}
+
+uint8_t TIM_setClockFreq() {
+	switch (TIM_getClockFreq()) {
+	case 0: tim.timer_counter = 256; break; // Freq 4096
+	case 1: tim.timer_counter = 4; break;	// Freq 262144
+	case 2: tim.timer_counter = 16; break;	// Freq 65536
+	case 3: tim.timer_counter = 64; break;  // Freq 16382
+	}
+}
+
