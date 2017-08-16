@@ -3,6 +3,16 @@
 #include "cpu.h"
 #include "mmu.h"
 
+/*----- CPU Init function -----*/
+void CPU_init() {
+	cpu.pc = 0x100;
+	cpu.af = 0x01B0;
+	cpu.bc = 0x0013;
+	cpu.de = 0x00D8;
+	cpu.hl = 0x014D;
+	cpu.sp = 0xFFFE;
+}
+
 /*----- Flag calculator functions -----*/
 void flagC8(uint8_t val1, uint8_t val2) { // Flag C calculator for 8-Bit register
 	if ((uint16_t)val1 + val2 & 0x100)

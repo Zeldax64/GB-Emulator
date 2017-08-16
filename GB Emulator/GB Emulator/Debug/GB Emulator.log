@@ -1,0 +1,8 @@
+﻿  mmu.c
+  main.c
+z:\projects\git\gb-emulator\gb emulator\gb emulator\main.c(36): warning C4476: 'printf': tipo desconhecido de caractere de campo 'R' no especificador de formato
+  cpu.c
+  Gerando Código...
+z:\projects\git\gb-emulator\gb emulator\gb emulator\mmu.c(92): warning C4715: 'rdByte': nem todos os caminhos de controle retornam um valor
+  GB Emulator.vcxproj -> Z:\Projects\git\GB-Emulator\GB Emulator\Debug\GB Emulator.exe
+  GB Emulator.vcxproj -> Z:\Projects\git\GB-Emulator\GB Emulator\Debug\GB Emulator.pdb (Partial PDB)

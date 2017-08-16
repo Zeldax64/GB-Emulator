@@ -1,8 +1,13 @@
 
 #include "mmu.h"
 
-void load(char * file){
+void MMU_init() {
+	mmu.ROMbank = 1;
+}
 
+
+void load(char * file){
+	/*
 	uint8_t sz;
 	uint8_t buffer;
 	uint8_t i;
@@ -16,7 +21,16 @@ void load(char * file){
 	for(i = 0; i<sz; i++){
 		mmu.rom[i] = buffer[i];
 	} 
-
+	*/
+	/*
+		Reads the cartridge type. It's important to know
+		if it's necessary to swap rom banks.
+		MBC 1:
+		1 = 
+		2 =
+		3 =
+		5, and 6 = MBC2
+	*/
 	mmu.carttype = mmu.rom[0x0147];
 
 }
@@ -130,7 +144,7 @@ uint16_t rdWord(uint16_t addr) {
 
 
 //Cálculo do offset?
-void wrByte(uint16_t addr) {
+void wrByte(uint16_t addr, uint8_t val) {
 	switch(addr & 0xF){
 
 		case 0x0000:
@@ -191,7 +205,7 @@ void wrByte(uint16_t addr) {
 		// Video RAM
 		case 0x8000:
 	    case 0x9000:
-	    	gpu.vram[addr&0x1FFF] = val;
+	    	mmu.vram[addr&0x1FFF] = val;
 	    	updatetile(addr&0x1FFF, val); // GPU
 	    	// É necessário implementar a GPU!!
 		break;
@@ -225,7 +239,7 @@ void wrByte(uint16_t addr) {
 				//porém ao comparar com o código do tutorial, está diferente.
 				case 0xE00:
 					if(addr&0xFF < 0x9F){
-						gpu.oam[addr&0xFF] = val;
+						mmu.oam[addr&0xFF] = val;
 						updateoam(addr, val); // GPU
 					}
 				break;
@@ -252,6 +266,6 @@ void wrByte(uint16_t addr) {
 
 
 void wrWord(uint16_t addr, uint8_t val){
-	wrByte(addr, val, mmu);
-	wrByte(addr + 1, val>>8, mmu);
+	wrByte(addr, val);
+	wrByte(addr + 1, val>>8);
 }

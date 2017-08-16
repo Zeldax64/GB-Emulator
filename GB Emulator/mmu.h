@@ -28,9 +28,11 @@ typedef struct{
 	MBC1 mbc1;
 
 	bool inbios; 
-	bool interruptEnabel;
+	bool interruptEnable; // Interrupt Enable Register - 0xFFFF
 
 	uint8_t carttype;
+	uint8_t ROMbank;
+
 	uint8_t bios[0x100]; // BIOS
 	uint8_t rom[0x100];	// ROM
 	uint8_t wram[0x100]; // Working RAM
@@ -46,6 +48,7 @@ typedef struct{
 }MMU;
 MMU mmu;
 
+void MMU_init();
 void load(char * file);
 void reset();
 uint8_t rdByte(uint16_t addr);
