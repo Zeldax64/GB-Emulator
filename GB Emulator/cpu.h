@@ -26,6 +26,9 @@
 
 #define CLEAR_FLAGS cpu.f = 0
 
+/*----- CPU Init function -----*/
+void CPU_init();
+
 /*----- Flag calculator functions -----*/
 void flagC8(uint8_t val1, uint8_t val2);
 void flagC16(uint16_t val1, uint16_t val2);
@@ -81,7 +84,7 @@ struct cpuregisters {
 	uint16_t sp;
 	uint16_t pc;
 
-	uint32_t m; // Machine cycle
+	int32_t m; // Machine cycle
 };
 struct cpuregisters cpu;
 

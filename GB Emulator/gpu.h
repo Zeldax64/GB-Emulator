@@ -1,6 +1,8 @@
 #ifndef _GPU
 #define _GPU
 
-// Not yet implemented
+#include <stdint.h>
+
+#include "cpu.h"
 
 #endif
