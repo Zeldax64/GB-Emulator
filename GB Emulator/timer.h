@@ -1,5 +1,5 @@
-#ifndef _TIM
-#define _TIM
+#ifndef _TIMER
+#define _TIMER
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -13,11 +13,10 @@
 #define TIM_TMC 0xFF07  // Timer Controller: 3-bit register
 
 /*----- Function prototypes -----*/
-void TIM_init();
 void TIM_updateTimers(int16_t cycles);
 void TIM_updateDIVR(int16_t cycles);
 uint8_t TIM_getClockFreq();
-uint8_t TIM_setClockFreq();
+void TIM_setClockFreq();
 
 /*----- Timer struct -----*/
 typedef struct gbtimer {

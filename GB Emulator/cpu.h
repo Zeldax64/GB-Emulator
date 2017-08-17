@@ -3,7 +3,9 @@
 
 /*---- Includes -----*/
 #include <stdint.h>
+#include <stdbool.h>
 
+#include "mmu.h"
 /*----- Defines -----*/
 #define BIT0 0x01
 #define BIT1 0x02
@@ -19,12 +21,12 @@
 #define FLAGH 0x20  // Half-carry flag
 #define FLAGC 0x10  // Carry flag
 
-#define CLEAR_Z cpu.f &= !FLAGZ // Clear flag Z
-#define CLEAR_N cpu.f &= !FLAGN // Clear flag N
-#define CLEAR_H cpu.f &= !FLAGH // Clear flag H
-#define CLEAR_C cpu.f &= !FLAGC // Clear flag C
+#define CLEAR_Z GB_cpu.f &= !FLAGZ // Clear flag Z
+#define CLEAR_N GB_cpu.f &= !FLAGN // Clear flag N
+#define CLEAR_H GB_cpu.f &= !FLAGH // Clear flag H
+#define CLEAR_C GB_cpu.f &= !FLAGC // Clear flag C
 
-#define CLEAR_FLAGS cpu.f = 0
+#define CLEAR_FLAGS GB_cpu.f = 0
 
 /*----- CPU Init function -----*/
 void CPU_init();
@@ -40,7 +42,7 @@ void flagZ8(uint8_t val);
 void flagZ16(uint16_t val);
 
 /*----- CPU Registers ------*/
-struct cpuregisters {
+typedef struct cpuregisters {
 	struct {
 		union {
 			struct {
@@ -81,12 +83,14 @@ struct cpuregisters {
 		};
 	};
 
-	uint16_t sp;
-	uint16_t pc;
+	bool ime; // interrupt Master Enabled
+	uint16_t sp; // Stack Pointer
+	uint16_t pc; // Program Counter
 
 	int32_t m; // Machine cycle
-};
-struct cpuregisters cpu;
+}GB_CPU;
+
+GB_CPU GB_cpu;
 
 ////////////////////////////
 /*----- Instructions -----*/
@@ -203,13 +207,11 @@ void RESHL(uint8_t bit);
 
 /*----- Jump Instructions -----*/
 void JPnn();
-// void JPccnn(uint8_t cc);
 void JPNZnn();
 void JPZnn();
 void JPNCnn();
 void JPCnn();
 void JRe();
-//void JRcce(uint8_t cc);
 /*
   Nota
   Watch all JRcce functions because e can be from -127 to 129.
@@ -233,10 +235,16 @@ void RETZ();
 void RETNC();
 void RETC();
 void RST(uint8_t t);
-void CPL();
-void NOP();
-void HALT();
 
 /*----- General-Purpose Arithmetic Operations and CPU Control Instructions -----*/
+void DAA();
+void CPL();
+void NOP();
+void CCF();
+void SCF();
+void DI();
+void EI();
+void HALT();
+
 
 #endif

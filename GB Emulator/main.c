@@ -16,27 +16,27 @@
 void emulateCycle();
 
 void printFlag() {
-	printf("FlagZ: %d\n", (cpu.f & FLAGZ ? 1 : 0));
-	printf("FlagN: %d\n", (cpu.f & FLAGN ? 1 : 0));
-	printf("FlagH: %d\n", (cpu.f & FLAGH ? 1 : 0));
-	printf("FlagC: %d\n", (cpu.f & FLAGC ? 1 : 0));
+	printf("FlagZ: %d\n", (GB_cpu.f & FLAGZ ? 1 : 0));
+	printf("FlagN: %d\n", (GB_cpu.f & FLAGN ? 1 : 0));
+	printf("FlagH: %d\n", (GB_cpu.f & FLAGH ? 1 : 0));
+	printf("FlagC: %d\n", (GB_cpu.f & FLAGC ? 1 : 0));
 }
 
 void main() {
 
 	CLEAR_FLAGS;
-	cpu.a = 0x81;
-	cpu.b = 0x3B;
-	//cpu.f |= FLAGC;
-	SETr(BIT7, &cpu.b);
-	printf("%Resultado 0x%x\n", cpu.b);
+	GB_cpu.a = 0x81;
+	GB_cpu.b = 0x3B;
+	//GB_cpu.f |= FLAGC;
+	SETr(BIT7, &GB_cpu.b);
+	printf("%Resultado 0x%x\n", GB_cpu.b);
 	printFlag();
 	
 	/*
-	cpu.a = 0xFF;
-	up(&cpu.a);
-	printf("%d\n", &cpu.a);
-	printf("%d\n", cpu.a);
+	GB_cpu.a = 0xFF;
+	up(&GB_cpu.a);
+	printf("%d\n", &GB_cpu.a);
+	printf("%d\n", GB_cpu.a);
 	*/
 }
 

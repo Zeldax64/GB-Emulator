@@ -35,6 +35,7 @@ void load(char * file){
 
 }
 
+// Nota: Fix warnings!
 void reset(){
 
 	//Reset MBC1
@@ -57,7 +58,7 @@ uint8_t rdByte(uint16_t addr) {
 		if (mmu.inbios) {
 			if (addr < 0x0100)
 				return mmu.bios[addr];
-			else if (cpu.pc == 0x0100)
+			else if (GB_cpu.pc == 0x0100)
 				mmu.inbios = 0;
 		}
 		// ROM 0
@@ -146,7 +147,7 @@ uint8_t rdByte(uint16_t addr) {
 }
 
 uint16_t rdWord(uint16_t addr) {
-	return rdByte(addr, mmu, cpu) + (rdByte(addr + 1, mmu, cpu) << 8);
+	return rdByte(addr) + (rdByte(addr + 1) << 8);
 }
 
 
@@ -214,7 +215,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 	case 0x8000:
 	case 0x9000:
 		mmu.vram[addr & 0x1FFF] = val;
-		updatetile(addr & 0x1FFF, val); // GPU
+		//updatetile(addr & 0x1FFF, val); // GPU
 		// É necessário implementar a GPU!!
 		break;
 
@@ -246,9 +247,9 @@ void wrByte(uint16_t addr, uint8_t val) {
 			//Caso implementado a partir do que foi observado no documento "GBCPUman.pdf",
 			//porém ao comparar com o código do tutorial, está diferente.
 		case 0xE00:
-			if (addr & 0xFF < 0x9F) {
+			if ((addr & 0xFF) < 0x9F) {
 				mmu.oam[addr & 0xFF] = val;
-				updateoam(addr, val); // GPU
+				//updateoam(addr, val); // GPU
 			}
 			break;
 
@@ -263,7 +264,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: tim.divr = val;
+					case TIM_DIVR: tim.divr = 0;
 					case TIM_TIMA: tim.tima = val;
 					case TIM_TMA:  tim.tma = val;
 					case TIM_TMC:  tim.tmc = val;
@@ -274,7 +275,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 }
 
 
-void wrWord(uint16_t addr, uint8_t val){
-	wrByte(addr, val);
+void wrWord(uint16_t addr, uint16_t val){
+	wrByte(addr, (uint8_t) val);
 	wrByte(addr + 1, val>>8);
 }

@@ -55,6 +55,6 @@ void reset();
 uint8_t rdByte(uint16_t addr);
 uint16_t rdWord(uint16_t addr);
 void wrByte(uint16_t addr, uint8_t val);
-void wrWord(uint16_t addr, uint8_t val);
+void wrWord(uint16_t addr, uint16_t val);
 
 #endif

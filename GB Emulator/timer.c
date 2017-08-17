@@ -13,10 +13,6 @@
 
 
 /*----- Functions -----*/
-void TIM_init() {
-	// To do
-	// Init tim variables with MMU's ioport values
-}
 
 void TIM_updateTimers(int16_t cycles) {
 	TIM_updateDIVR(cycles); // Update Clock divider register
@@ -52,12 +48,12 @@ uint8_t TIM_getClockFreq() {
 	return tim.tmc & 0x3;
 }
 
-uint8_t TIM_setClockFreq() {
+void TIM_setClockFreq() {
 	switch (TIM_getClockFreq()) {
-	case 0: tim.timer_counter = 256; break; // Freq 4096
-	case 1: tim.timer_counter = 4; break;	// Freq 262144
-	case 2: tim.timer_counter = 16; break;	// Freq 65536
-	case 3: tim.timer_counter = 64; break;  // Freq 16382
+	case 0: tim.timer_counter = 256; break; // Freq 4096 Hz
+	case 1: tim.timer_counter = 4; break;	// Freq 262144 Hz
+	case 2: tim.timer_counter = 16; break;	// Freq 65536 Hz
+	case 3: tim.timer_counter = 64; break;  // Freq 16382 Hz
 	}
 }
 
