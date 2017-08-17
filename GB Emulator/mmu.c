@@ -124,13 +124,21 @@ uint8_t rdByte(uint16_t addr) {
 
 			// Zero page
 		case 0x0F00:
+			if (addr == 0xFFFF) {
+				return mmu.ie;
+			}
 			// Zero page is 128 bytes
 			if (addr >= 0xFF80) {
 				return mmu.zram[addr & 0x7F];
 			}
 			else {
 				// I/O control handling
-				//return ioport[addr & ]
+				switch (addr & 0xFF) {
+					case TIM_DIVR: return tim.divr;
+					case TIM_TIMA: return tim.tima;
+					case TIM_TMA:  return tim.tma;
+					case TIM_TMC:  return tim.tmc;
+				}
 				return 0;
 			}
 		}
@@ -145,122 +153,123 @@ uint16_t rdWord(uint16_t addr) {
 
 //Cálculo do offset?
 void wrByte(uint16_t addr, uint8_t val) {
-	switch(addr & 0xF){
+	switch (addr & 0xF) {
 
-		case 0x0000:
-	    case 0x1000:
-			switch(mmu.carttype){
-				case 3:
-					if((val & 0xF) == 0xA){
-						mmu.mbc1.enableERam = 1;
-					}
-				break;
+	case 0x0000:
+	case 0x1000:
+		switch (mmu.carttype) {
+		case 3:
+			if ((val & 0xF) == 0xA) {
+				mmu.mbc1.enableERam = 1;
 			}
+			break;
+		}
 		break;
 
-		case 0x2000:
-	    case 0x3000:
-	    	switch(mmu.carttype){
-				case 3:
-					val = val & 0x1F;
-					if(!val) val = 1;
-					
-					mmu.mbc1.rombank = mmu.mbc1.rombank & 0x60; // Por que isso é feito?
-					mmu.mbc1.rombank = mmu.mbc1.rombank | val;
+	case 0x2000:
+	case 0x3000:
+		switch (mmu.carttype) {
+		case 3:
+			val = val & 0x1F;
+			if (!val) val = 1;
 
-					mmu.romoffset = mmu.mbc1.rombank * 0x4000;
+			mmu.mbc1.rombank = mmu.mbc1.rombank & 0x60; // Por que isso é feito?
+			mmu.mbc1.rombank = mmu.mbc1.rombank | val;
 
-				break;
-			}
-		break;
-		
-		case 0x4000:
-	    case 0x5000:
-	    	switch(mmu.carttype){
-				case 3:
-					val = val & 0x3;
-					if(mmu.mbc1.mode){
-						mmu.mbc1.rambank = val;
-						mmu.ramoffset = mmu.mbc1.rambank * 0x2000;// Por que esse offset?
-					}
-					else{
-						mmu.mbc1.rombank = mmu.mbc1.rombank & 0x1F;
-						mmu.mbc1.rombank = mmu.mbc1.rombank | val;
-						mmu.romoffset = mmu.mbc1.rombank * 0x4000;
-					}
-				break;
-			}
+			mmu.romoffset = mmu.mbc1.rombank * 0x4000;
+
+			break;
+		}
 		break;
 
-		case 0x6000:
-	    case 0x7000:
-	    	switch(mmu.carttype){
-				case 3:
-					val = val & 0x1;
-					mmu.mbc1.mode = val;
-				break;
+	case 0x4000:
+	case 0x5000:
+		switch (mmu.carttype) {
+		case 3:
+			val = val & 0x3;
+			if (mmu.mbc1.mode) {
+				mmu.mbc1.rambank = val;
+				mmu.ramoffset = mmu.mbc1.rambank * 0x2000;// Por que esse offset?
 			}
+			else {
+				mmu.mbc1.rombank = mmu.mbc1.rombank & 0x1F;
+				mmu.mbc1.rombank = mmu.mbc1.rombank | val;
+				mmu.romoffset = mmu.mbc1.rombank * 0x4000;
+			}
+			break;
+		}
+		break;
+
+	case 0x6000:
+	case 0x7000:
+		switch (mmu.carttype) {
+		case 3:
+			val = val & 0x1;
+			mmu.mbc1.mode = val;
+			break;
+		}
 		break;
 
 		// Video RAM
-		case 0x8000:
-	    case 0x9000:
-	    	mmu.vram[addr&0x1FFF] = val;
-	    	updatetile(addr&0x1FFF, val); // GPU
-	    	// É necessário implementar a GPU!!
+	case 0x8000:
+	case 0x9000:
+		mmu.vram[addr & 0x1FFF] = val;
+		updatetile(addr & 0x1FFF, val); // GPU
+		// É necessário implementar a GPU!!
 		break;
 
 		// External RAM
-		case 0xA000:
-	    case 0xB000:
-	    	mmu.eram[mmu.ramoffset + (addr&0x1FFF)] = val;
+	case 0xA000:
+	case 0xB000:
+		mmu.eram[mmu.ramoffset + (addr & 0x1FFF)] = val;
 		break;
 
 		// Internal RAM
-		case 0xC000:
-	    case 0xD000:
-	    case 0xE000:
-	    	mmu.wram[addr&0x1FFF] = val;
+	case 0xC000:
+	case 0xD000:
+	case 0xE000:
+		mmu.wram[addr & 0x1FFF] = val;
 		break;
 
-		case 0xF000:
-			switch(addr&0x0F00){
-				case 0x000: case 0x100: case 0x200: case 0x300:
-				case 0x400: case 0x500: case 0x600: case 0x700:
-				case 0x800: case 0x900: case 0xA00: case 0xB00:
-				case 0xC00: case 0xD00:
-					mmu.wram[addr&0x1FFF] = val;
-				break;
+	case 0xF000:
+		switch (addr & 0x0F00) {
+		case 0x000: case 0x100: case 0x200: case 0x300:
+		case 0x400: case 0x500: case 0x600: case 0x700:
+		case 0x800: case 0x900: case 0xA00: case 0xB00:
+		case 0xC00: case 0xD00:
+			mmu.wram[addr & 0x1FFF] = val;
+			break;
 
-				/* Dependem da GPU e KEY */
-				//Sprite Attribute Table
-				// OAM
-				//Caso implementado a partir do que foi observado no documento "GBCPUman.pdf",
-				//porém ao comparar com o código do tutorial, está diferente.
-				case 0xE00:
-					if(addr&0xFF < 0x9F){
-						mmu.oam[addr&0xFF] = val;
-						updateoam(addr, val); // GPU
-					}
-				break;
-
-				// Zeropage RAM, I/O, interrupts
-				case 0xF00:
-					switch(addr&0xFF){
-						case 0xA0:
-							//... IO
-						case 0x00:
-							//... IO
-						case 0x4C:
-							//... IO
-						case 0x80:
-							mmu.zram[addr&0x7F] = val;
-						break;
-					}
-				
-
-
+			/* Dependem da GPU e KEY */
+			//Sprite Attribute Table
+			// OAM
+			//Caso implementado a partir do que foi observado no documento "GBCPUman.pdf",
+			//porém ao comparar com o código do tutorial, está diferente.
+		case 0xE00:
+			if (addr & 0xFF < 0x9F) {
+				mmu.oam[addr & 0xFF] = val;
+				updateoam(addr, val); // GPU
 			}
+			break;
+
+			// Zeropage RAM, I/O, interrupts
+		case 0xF00:
+			if (addr == 0xFFFF)
+				mmu.ie = val;
+			// Zero page is 128 bytes
+			if (addr >= 0xFF80) {
+				mmu.zram[addr & 0x7F] = val;
+			}
+			else {
+				// I/O control handling
+				switch (addr & 0xFF) {
+					case TIM_DIVR: tim.divr = val;
+					case TIM_TIMA: tim.tima = val;
+					case TIM_TMA:  tim.tma = val;
+					case TIM_TMC:  tim.tmc = val;
+				}
+			}
+		}
 	}
 }
 

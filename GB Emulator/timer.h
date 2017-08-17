@@ -7,10 +7,10 @@
 #include "mmu.h"
 
 /*----- Defines -----*/
-#define DIVR 0xFF04 // Divider Register
-#define TIMA 0xFF05 // Timer Counter: 8-byte register
-#define TMA 0xFF06  // Timer modulo
-#define TMC 0xFF07  // Timer Controller: 3-bit register
+#define TIM_DIVR 0xFF04 // Divider Register
+#define TIM_TIMA 0xFF05 // Timer Counter: 8-byte register
+#define TIM_TMA 0xFF06  // Timer modulo
+#define TIM_TMC 0xFF07  // Timer Controller: 3-bit register
 
 /*----- Function prototypes -----*/
 void TIM_init();
@@ -23,11 +23,15 @@ uint8_t TIM_setClockFreq();
 typedef struct gbtimer {
 	int16_t timer_counter;
 	int16_t divider_counter;
-	uint8_t *divr;
-	uint8_t *tima;
-	uint8_t *tma;
-	uint8_t *tmc;
+	uint8_t divr;
+	uint8_t tima;
+	uint8_t tma;
+	uint8_t tmc;
 }GB_TIM;
+
+/*---- Variables -----*/
+GB_TIM tim;
+
 
 #endif
 

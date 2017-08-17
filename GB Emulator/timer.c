@@ -11,8 +11,6 @@
 	I'm working with machine cycles instead of clock cycles. Thus, all counter values are divided by 4
 */
 
-/*---- Variables -----*/
-static GB_TIM tim;
 
 /*----- Functions -----*/
 void TIM_init() {
@@ -23,16 +21,16 @@ void TIM_init() {
 void TIM_updateTimers(int16_t cycles) {
 	TIM_updateDIVR(cycles); // Update Clock divider register
 
-	if (*tim.tmc & 0x4) { // Is counter on?
+	if (tim.tmc & 0x4) { // Is counter on?
 		tim.timer_counter -= cycles; 
 		if (tim.timer_counter <= 0) {
 			TIM_setClockFreq(); // Reset timer_counter
-			if (*tim.tima == 255) { // If overflow
-				*tim.tima = *tim.tma; // Timer register = timer modulo 
+			if (tim.tima == 255) { // If overflow
+				tim.tima = tim.tma; // Timer register = timer modulo 
 				//requestInterrupt(2);
 			}
 			else {
-				*tim.tima++; // Increment timer register
+				tim.tima++; // Increment timer register
 			}
 		}
 	}
@@ -46,12 +44,12 @@ void TIM_updateDIVR(int16_t cycles) {
 			I'm using -= instead of = and 64 instead of 255 (machine cycle instead of clk cycle) 
 		*/
 		tim.divider_counter -= 64;
-		*tim.divr++;
+		tim.divr++;
 	}
 }
 
 uint8_t TIM_getClockFreq() {
-	return *tim.tmc & 0x3;
+	return tim.tmc & 0x3;
 }
 
 uint8_t TIM_setClockFreq() {

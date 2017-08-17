@@ -7,11 +7,12 @@
 #ifndef _MMU
 #define _MMU
 
-#include "cpu.h"
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "cpu.h"
+#include "timer.h"
 
 #define MEM_SIZE 65535  // Useless?
 #define MEM8K 0x1FFF  // Represents 8kB of memory
@@ -28,7 +29,7 @@ typedef struct{
 	MBC1 mbc1;
 
 	bool inbios; 
-	bool interruptEnable; // Interrupt Enable Register - 0xFFFF
+	bool ie; // Interrupt Enable Register - 0xFFFF
 
 	uint8_t carttype;
 	uint8_t ROMbank;
@@ -40,8 +41,6 @@ typedef struct{
 	uint8_t zram[0x7F];    // Zero page RAM
 	uint8_t vram[0x2000];  // Video RAM - GPU?
 	uint8_t oam[0xA0];	   // OAM RAM - GPU?
-	uint8_t ioports[0x4C]; // I/O Ports
-
 
 	uint8_t romoffset;
 	uint8_t ramoffset;
