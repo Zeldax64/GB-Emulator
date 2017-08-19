@@ -13,10 +13,20 @@
 
 #include "cpu.h"
 #include "timer.h"
+#include "interrupt.h"
 
-#define MEM_SIZE 65535  // Useless?
 #define MEM8K 0x1FFF  // Represents 8kB of memory
 
+/*----- Function Prototypes -----*/
+void MMU_init();
+void load(char * file);
+void reset();
+uint8_t rdByte(uint16_t addr);
+uint16_t rdWord(uint16_t addr);
+void wrByte(uint16_t addr, uint8_t val);
+void wrWord(uint16_t addr, uint16_t val);
+
+/*----- Structs -----*/
 typedef struct{
 	uint8_t rombank; // Selected ROM bank
 	uint8_t rambank; // Selected RAM bank
@@ -49,12 +59,6 @@ typedef struct{
 }MMU;
 MMU mmu;
 
-void MMU_init();
-void load(char * file);
-void reset();
-uint8_t rdByte(uint16_t addr);
-uint16_t rdWord(uint16_t addr);
-void wrByte(uint16_t addr, uint8_t val);
-void wrWord(uint16_t addr, uint16_t val);
+
 
 #endif

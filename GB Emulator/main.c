@@ -12,9 +12,6 @@
 #define GB_CLOCK 4194304
 #define MAXCYCLES 69905 // GB_CLOCK / Frame Rate (60Hz)
 
-
-void emulateCycle();
-
 void printFlag() {
 	printf("FlagZ: %d\n", (GB_cpu.f & FLAGZ ? 1 : 0));
 	printf("FlagN: %d\n", (GB_cpu.f & FLAGN ? 1 : 0));
@@ -29,7 +26,7 @@ void main() {
 	GB_cpu.b = 0x3B;
 	//GB_cpu.f |= FLAGC;
 	SETr(BIT7, &GB_cpu.b);
-	printf("%Resultado 0x%x\n", GB_cpu.b);
+	printf("Resultado 0x%x\n", GB_cpu.b);
 	printFlag();
 	
 	/*

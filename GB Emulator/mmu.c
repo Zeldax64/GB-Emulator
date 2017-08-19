@@ -135,10 +135,12 @@ uint8_t rdByte(uint16_t addr) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: return tim.divr;
-					case TIM_TIMA: return tim.tima;
-					case TIM_TMA:  return tim.tma;
-					case TIM_TMC:  return tim.tmc;
+					case TIM_DIVR: return GB_tim.divr;	  // 0xFF04
+					case TIM_TIMA: return GB_tim.tima;	  // 0xFF05
+					case TIM_TMA:  return GB_tim.tma;	  // 0xFF06
+					case TIM_TMC:  return GB_tim.tmc;	  // 0xFF07
+					case INT_REQ:  return GB_int.int_req; // 0xFF0F
+					case INT_ENA:  return GB_int.int_ena; // 0xFFFF
 				}
 				return 0;
 			}
@@ -264,10 +266,12 @@ void wrByte(uint16_t addr, uint8_t val) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: tim.divr = 0;
-					case TIM_TIMA: tim.tima = val;
-					case TIM_TMA:  tim.tma = val;
-					case TIM_TMC:  tim.tmc = val;
+					case TIM_DIVR: GB_tim.divr = 0;   break; // 0xFF04
+					case TIM_TIMA: GB_tim.tima = val; break; // 0xFF05
+					case TIM_TMA:  GB_tim.tma = val;  break; // 0xFF06
+					case TIM_TMC:  GB_tim.tmc = val;  break; // 0xFF07
+					case INT_REQ:  GB_int.int_req = val; break;  // 0xFF0F
+					case INT_ENA:  GB_int.int_ena = val;  break; // 0xFFFF
 				}
 			}
 		}

@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "mmu.h"
+#include "interrupt.h"
 
 /*----- Defines -----*/
 #define TIM_DIVR 0xFF04 // Divider Register
@@ -29,7 +30,7 @@ typedef struct gbtimer {
 }GB_TIM;
 
 /*---- Variables -----*/
-GB_TIM tim;
+GB_TIM GB_tim;
 
 
 #endif
