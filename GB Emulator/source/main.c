@@ -71,12 +71,15 @@ void printOAM() {
 /*
 	Compare arrays function.
 */
-bool cmpArray(uint32_t *ar1, uint32_t *ar2, uint32_t end) {
+bool cmpArray8(uint8_t *ar1, uint8_t *ar2, uint32_t end) {
 	for (uint32_t i = 0; i < end; i++) {
 		if (*(ar1 + i) != *(ar2 + i)) {
-			printf("Error in value %d\nar1: %d   ar2: %d\n", *(ar1 + i), *(ar2 + i));
+		//if (*ar1 != *ar2) {
+
+			printf("Error in value %d\nar1: %d   ar2: %d\n", i, *(ar1 + i), *(ar2 + i));
 			return false;
 		}
+		//ar1++; ar2++;
 	}
 	printf("Identical arrays!\n");
 	return true;
@@ -91,12 +94,12 @@ void main() {
 		printf("Load success!\n");
 	}
 
-	uint16_t addr = 0x6;
+	uint16_t addr = 0x0;
 	DMA_doDMA(addr);
-	addr <<= 2;
+	addr <<= 8;
 	printOAM();
 	uint8_t *src = MMU_getAddr(addr);
 	uint8_t *dst = MMU_getAddr(0xFE00);
-	printf("%d", cmpArray(src, dst, 0, 0xA0));
+	printf("%d", cmpArray8(src, dst, 0xA0));
 }
 

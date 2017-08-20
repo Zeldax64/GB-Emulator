@@ -307,7 +307,7 @@ void wrWord(uint16_t addr, uint16_t val){
 	wrByte(addr + 1, val>>8);
 }
 
-uint8_t* MMU_getAddr(uint16_t addr) {
+uint8_t * MMU_getAddr(uint16_t addr) {
 	switch (addr & 0xF000) {
 	case 0x0000:
 	case 0x1000:
