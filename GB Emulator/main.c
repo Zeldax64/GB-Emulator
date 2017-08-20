@@ -1,16 +1,59 @@
+///////////////////////////////////
+/*----- GB Emulator Project -----*/
+///////////////////////////////////
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include "cpu.h"
 #include "mmu.h"
 
-///////////////////////////////////
-/*----- GB Emulator Project -----*/
-///////////////////////////////////
 /*----- Defines -----*/
 #define GB_CLOCK 4194304
 #define MAXCYCLES 69905 // GB_CLOCK / Frame Rate (60Hz)
+
+bool loadROM(char * filename) {
+	uint32_t size;
+	uint8_t *buffer;
+
+	FILE *file = fopen(filename, "rb");
+	if (file == NULL) {
+		printf("File couldn't be found\n");
+		return false;
+	}
+
+	// Check file size
+	fseek(file, 0L, SEEK_END);
+	size = ftell(file);
+	
+	// Return file pointer to begin of file
+	rewind(file);
+
+	buffer = (uint8_t*)malloc(sizeof(uint8_t) * size);
+	if (buffer == NULL) {
+		printf("Memory error\n");
+		return false;
+	}
+	
+	// Copy the file into the buffer
+	size_t result = fread(buffer, 1, size, file);
+
+	if (result != size) {
+		printf("Reading error\n");
+		return false;
+	}
+
+	for (uint32_t i = 0; i < size; i++) {
+		GB_mmu.rom[i] = buffer[i];
+	}
+
+	
+	fclose(file);
+	free(buffer);
+	return true;
+}
 
 void printFlag() {
 	printf("FlagZ: %d\n", (GB_cpu.f & FLAGZ ? 1 : 0));
@@ -19,21 +62,41 @@ void printFlag() {
 	printf("FlagC: %d\n", (GB_cpu.f & FLAGC ? 1 : 0));
 }
 
-void main() {
+void printOAM() {
+	for (uint8_t i = 0; i < 0xA0; i++) {
+		printf("%x: %x\n", i, GB_mmu.oam[i]);
+	}
+}
 
-	CLEAR_FLAGS;
-	GB_cpu.a = 0x81;
-	GB_cpu.b = 0x3B;
-	//GB_cpu.f |= FLAGC;
-	SETr(BIT7, &GB_cpu.b);
-	printf("Resultado 0x%x\n", GB_cpu.b);
-	printFlag();
+/*
+	Compare arrays function.
+*/
+bool cmpArray(uint32_t *ar1, uint32_t *ar2, uint32_t end) {
+	for (uint32_t i = 0; i < end; i++) {
+		if (*(ar1 + i) != *(ar2 + i)) {
+			printf("Error in value %d\nar1: %d   ar2: %d\n", *(ar1 + i), *(ar2 + i));
+			return false;
+		}
+	}
+	printf("Identical arrays!\n");
+	return true;
+}
+
+void main() {
+	char *filename = "Z:\\Jogos\\GB\\Roms\\Tetris\\Tetris.gb";
 	
-	/*
-	GB_cpu.a = 0xFF;
-	up(&GB_cpu.a);
-	printf("%d\n", &GB_cpu.a);
-	printf("%d\n", GB_cpu.a);
-	*/
+	MMU_init();
+
+	if (loadROM(filename)) {
+		printf("Load success!\n");
+	}
+
+	uint16_t addr = 0x6;
+	DMA_doDMA(addr);
+	addr <<= 2;
+	printOAM();
+	uint8_t *src = MMU_getAddr(addr);
+	uint8_t *dst = MMU_getAddr(0xFE00);
+	printf("%d", cmpArray(src, dst, 0, 0xA0));
 }
 

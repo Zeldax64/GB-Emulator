@@ -13,6 +13,7 @@
 
 #include "cpu.h"
 #include "timer.h"
+#include "dma.h"
 #include "interrupt.h"
 
 #define MEM8K 0x1FFF  // Represents 8kB of memory
@@ -56,8 +57,9 @@ typedef struct{
 	uint8_t ramoffset;
 
 
-}MMU;
-MMU mmu;
+}GB_MMU;
+
+GB_MMU GB_mmu;
 
 
 
