@@ -2,13 +2,18 @@
 /*----- GB Emulator Project -----*/
 ///////////////////////////////////
 
+/* General Includes */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
+/* Emulator Includes */
 #include "cpu.h"
 #include "mmu.h"
+
+/* Debug Includes */
+#include "debug.h"
 
 /*----- Defines -----*/
 #define GB_CLOCK 4194304
@@ -68,38 +73,9 @@ void printOAM() {
 	}
 }
 
-/*
-	Compare arrays function.
-*/
-bool cmpArray8(uint8_t *ar1, uint8_t *ar2, uint32_t end) {
-	for (uint32_t i = 0; i < end; i++) {
-		if (*(ar1 + i) != *(ar2 + i)) {
-		//if (*ar1 != *ar2) {
 
-			printf("Error in value %d\nar1: %d   ar2: %d\n", i, *(ar1 + i), *(ar2 + i));
-			return false;
-		}
-		//ar1++; ar2++;
-	}
-	printf("Identical arrays!\n");
-	return true;
-}
 
 void main() {
-	char *filename = "Z:\\Jogos\\GB\\Roms\\Tetris\\Tetris.gb";
-	
-	MMU_init();
 
-	if (loadROM(filename)) {
-		printf("Load success!\n");
-	}
-
-	uint16_t addr = 0x0;
-	DMA_doDMA(addr);
-	addr <<= 8;
-	printOAM();
-	uint8_t *src = MMU_getAddr(addr);
-	uint8_t *dst = MMU_getAddr(0xFE00);
-	printf("%d", cmpArray8(src, dst, 0xA0));
 }
 
