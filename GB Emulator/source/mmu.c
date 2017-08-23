@@ -80,7 +80,7 @@ uint8_t rdByte(uint16_t addr) {
 		if (GB_mmu.inbios) {
 			if (addr < 0x0100)
 				return GB_mmu.bios[addr];
-			else if (GB_cpu.pc == 0x0100)
+			else if (gb_cpu.pc == 0x0100)
 				GB_mmu.inbios = 0;
 		}
 		// ROM 0

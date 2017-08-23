@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 /* Emulator Includes */
+#include "bit.h"
 #include "interrupt.h"
 
 /*----- Defines -----*/
@@ -20,8 +21,14 @@
 #define LCD_SCY  0xFF42
 #define LCD_SCX  0xFF43
 #define LCD_LY   0xFF44
+#define LCD_LYC  0xFF45
 
-#define IS_LCD_ON (GB_lcd.lcdc & 0x80)
+#define IS_LCD_ON (gb_lcd.lcdc & BIT7)
+
+// Mode defines. Mode transition takes 114 M-Cycles
+// or 456 clock cycles.
+#define MODE_2 94 // 114 - 20 = 94 (M-Cycles)
+#define MODE_3 51 // MODE2 - 43 = 51 (M-Cycles)
 
 /*----- Function prototypes -----*/
 void LCD_update(int16_t cycles);
@@ -36,9 +43,10 @@ typedef struct gblcd {
 	uint8_t scy;
 	uint8_t scx;
 	uint8_t ly;
+	uint8_t lyc;
 
 }GB_LCD;
 
-GB_LCD GB_lcd;
+GB_LCD gb_lcd;
 
 #endif

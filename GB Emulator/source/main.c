@@ -61,10 +61,10 @@ bool loadROM(char * filename) {
 }
 
 void printFlag() {
-	printf("FlagZ: %d\n", (GB_cpu.f & FLAGZ ? 1 : 0));
-	printf("FlagN: %d\n", (GB_cpu.f & FLAGN ? 1 : 0));
-	printf("FlagH: %d\n", (GB_cpu.f & FLAGH ? 1 : 0));
-	printf("FlagC: %d\n", (GB_cpu.f & FLAGC ? 1 : 0));
+	printf("FlagZ: %d\n", (gb_cpu.f & FLAGZ ? 1 : 0));
+	printf("FlagN: %d\n", (gb_cpu.f & FLAGN ? 1 : 0));
+	printf("FlagH: %d\n", (gb_cpu.f & FLAGH ? 1 : 0));
+	printf("FlagC: %d\n", (gb_cpu.f & FLAGC ? 1 : 0));
 }
 
 void printOAM() {

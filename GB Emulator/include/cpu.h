@@ -5,28 +5,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "bit.h"
 #include "mmu.h"
+
 /*----- Defines -----*/
-#define BIT0 0x01
-#define BIT1 0x02
-#define BIT2 0x04
-#define BIT3 0x08
-#define BIT4 0x10
-#define BIT5 0x20
-#define BIT6 0x40
-#define BIT7 0x80
+#define FLAGZ BIT7  // Zero flag
+#define FLAGN BIT6  // Subtraction flag
+#define FLAGH BIT5  // Half-carry flag
+#define FLAGC BIT4  // Carry flag
 
-#define FLAGZ 0x80  // Zero flag
-#define FLAGN 0x40  // Subtraction flag
-#define FLAGH 0x20  // Half-carry flag
-#define FLAGC 0x10  // Carry flag
+#define CLEAR_Z gb_cpu.f &= !FLAGZ // Clear flag Z
+#define CLEAR_N gb_cpu.f &= !FLAGN // Clear flag N
+#define CLEAR_H gb_cpu.f &= !FLAGH // Clear flag H
+#define CLEAR_C gb_cpu.f &= !FLAGC // Clear flag C
 
-#define CLEAR_Z GB_cpu.f &= !FLAGZ // Clear flag Z
-#define CLEAR_N GB_cpu.f &= !FLAGN // Clear flag N
-#define CLEAR_H GB_cpu.f &= !FLAGH // Clear flag H
-#define CLEAR_C GB_cpu.f &= !FLAGC // Clear flag C
-
-#define CLEAR_FLAGS GB_cpu.f = 0
+#define CLEAR_FLAGS gb_cpu.f = 0
 
 /*----- CPU Init function -----*/
 void CPU_init();
@@ -90,7 +83,7 @@ typedef struct cpuregisters {
 	int32_t m; // Machine cycle
 }GB_CPU;
 
-GB_CPU GB_cpu;
+GB_CPU gb_cpu;
 
 /*----- Const table -----*/
 

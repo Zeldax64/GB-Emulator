@@ -1,9 +1,13 @@
 #ifndef _INTERRUPT
 #define _INTERRUPT
 
+/*----- Includes -----*/
+/* General Includes */
 #include <stdint.h>
 #include <stdbool.h>
 
+/* Emulator Incldues */
+#include "bit.h"
 #include "mmu.h"
 #include "cpu.h"
 
