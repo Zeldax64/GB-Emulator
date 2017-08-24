@@ -51,7 +51,7 @@ bool loadROM(char * filename) {
 	}
 
 	for (uint32_t i = 0; i < size; i++) {
-		GB_mmu.rom[i] = buffer[i];
+		gb_mmu.rom[i] = buffer[i];
 	}
 
 	
@@ -69,7 +69,7 @@ void printFlag() {
 
 void printOAM() {
 	for (uint8_t i = 0; i < 0xA0; i++) {
-		printf("%x: %x\n", i, GB_mmu.oam[i]);
+		printf("%x: %x\n", i, gb_mmu.oam[i]);
 	}
 }
 

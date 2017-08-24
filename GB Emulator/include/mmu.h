@@ -61,7 +61,7 @@ typedef struct{
 
 }GB_MMU;
 
-GB_MMU GB_mmu;
+GB_MMU gb_mmu;
 
 
 

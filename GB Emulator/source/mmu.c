@@ -2,27 +2,27 @@
 
 void MMU_init() {
 	for (uint16_t i = 0; i < MEM8K; i++) {
-		GB_mmu.rom[i] = 0;
+		gb_mmu.rom[i] = 0;
 	}
 
 	for (uint16_t i = 0; i < 0x2000; i++) {
-		GB_mmu.wram[i] = 0;
+		gb_mmu.wram[i] = 0;
 	}
 
 	for (uint16_t i = 0; i < 0x2000; i++) {
-		GB_mmu.eram[i] = 0;
+		gb_mmu.eram[i] = 0;
 	}
 
 	for (uint8_t i = 0; i < 0x7F; i++) {
-		GB_mmu.zram[i] = 0;
+		gb_mmu.zram[i] = 0;
 	}
 
 	for (uint16_t i = 0; i < 0x2000; i++) {
-		GB_mmu.vram[i] = 0;
+		gb_mmu.vram[i] = 0;
 	}
 
 	for (uint8_t i = 0; i < 0xA0; i++) {
-		GB_mmu.oam[i] = 0;
+		gb_mmu.oam[i] = 0;
 	}
 
 }
@@ -41,7 +41,7 @@ void load(char * file){
 	fread(&buffer,sz,1,program);
 
 	for(i = 0; i<sz; i++){
-		GB_mmu.rom[i] = buffer[i];
+		gb_mmu.rom[i] = buffer[i];
 	} 
 	*/
 	/*
@@ -53,7 +53,7 @@ void load(char * file){
 		3 =
 		5, and 6 = MBC2
 	*/
-	GB_mmu.carttype = GB_mmu.rom[0x0147];
+	gb_mmu.carttype = gb_mmu.rom[0x0147];
 
 }
 
@@ -61,13 +61,13 @@ void load(char * file){
 void reset(){
 
 	//Reset MBC1
-	GB_mmu.mbc1.rombank = 0;
-	GB_mmu.mbc1.rambank = 0;
-	GB_mmu.mbc1.enableERam = 0;
-	GB_mmu.mbc1.mode = 0;
+	gb_mmu.mbc1.rombank = 0;
+	gb_mmu.mbc1.rambank = 0;
+	gb_mmu.mbc1.enableERam = 0;
+	gb_mmu.mbc1.mode = 0;
 
-	GB_mmu.romoffset = 0x4000;
-	GB_mmu.ramoffset = 0x0000;
+	gb_mmu.romoffset = 0x4000;
+	gb_mmu.ramoffset = 0x0000;
 
 
 }
@@ -77,11 +77,11 @@ uint8_t rdByte(uint16_t addr) {
 	switch (addr & 0xF000) {
 	case 0x0000:
 		// Bios check
-		if (GB_mmu.inbios) {
+		if (gb_mmu.inbios) {
 			if (addr < 0x0100)
-				return GB_mmu.bios[addr];
+				return gb_mmu.bios[addr];
 			else if (gb_cpu.pc == 0x0100)
-				GB_mmu.inbios = 0;
+				gb_mmu.inbios = 0;
 		}
 		// ROM 0
 		/* DIFERENTE*/
@@ -90,33 +90,33 @@ uint8_t rdByte(uint16_t addr) {
 	case 0x1000:
 	case 0x2000:
 	case 0x3000:
-		return GB_mmu.rom[addr];
+		return gb_mmu.rom[addr];
 
 		// ROM 1 (Unbanked) (16k)
 	case 0x4000:
 	case 0x5000:
 	case 0x6000:
 	case 0x7000:
-		return GB_mmu.rom[addr];
+		return gb_mmu.rom[addr];
 
 		// Graphics: VRAM (8k)
 	case 0x8000:
 	case 0x9000:
-		return GB_mmu.vram[addr & MEM8K];
+		return gb_mmu.vram[addr & MEM8K];
 
 		// External RAM (8k)
 	case 0xA000:
 	case 0xB000:
-		return GB_mmu.eram[addr & MEM8K];
+		return gb_mmu.eram[addr & MEM8K];
 
 		// Working RAM (8k)
 	case 0xC000:
 	case 0xD000:
-		return GB_mmu.wram[addr & MEM8K];
+		return gb_mmu.wram[addr & MEM8K];
 
 		// Working RAM shadow
 	case 0xE000:
-		return GB_mmu.wram[addr & MEM8K];
+		return gb_mmu.wram[addr & MEM8K];
 
 		// Working RAM shadow, I/O, Zero Page RAM
 	case 0xF000:
@@ -126,7 +126,7 @@ uint8_t rdByte(uint16_t addr) {
 		case 0x0400: case 0x0500: case 0x0600: case 0x0700:
 		case 0x0800: case 0x0900: case 0x0A00: case 0x0B00:
 		case 0x0C00: case 0x0D00:
-			return GB_mmu.wram[addr & MEM8K];
+			return gb_mmu.wram[addr & MEM8K];
 
 			// Graphics: object attribute memory (OAM)
 			// OAM is 160 bytes, remaining bytes read as 0
@@ -143,16 +143,16 @@ uint8_t rdByte(uint16_t addr) {
 			// OAM is 160 bytes (A0), remaining bytes read as 0
 
 		case 0x0E00:
-			return GB_mmu.oam[addr & 0xFF];
+			return gb_mmu.oam[addr & 0xFF];
 
 			// Zero page
 		case 0x0F00:
 			if (addr == 0xFFFF) {
-				return GB_mmu.ie;
+				return gb_mmu.ie;
 			}
 			// Zero page is 128 bytes
 			if (addr >= 0xFF80) {
-				return GB_mmu.zram[addr & 0x7F];
+				return gb_mmu.zram[addr & 0x7F];
 			}
 			else {
 				// I/O control handling
@@ -182,10 +182,10 @@ void wrByte(uint16_t addr, uint8_t val) {
 
 	case 0x0000:
 	case 0x1000:
-		switch (GB_mmu.carttype) {
+		switch (gb_mmu.carttype) {
 		case 3:
 			if ((val & 0xF) == 0xA) {
-				GB_mmu.mbc1.enableERam = 1;
+				gb_mmu.mbc1.enableERam = 1;
 			}
 			break;
 		}
@@ -193,15 +193,15 @@ void wrByte(uint16_t addr, uint8_t val) {
 
 	case 0x2000:
 	case 0x3000:
-		switch (GB_mmu.carttype) {
+		switch (gb_mmu.carttype) {
 		case 3:
 			val = val & 0x1F;
 			if (!val) val = 1;
 
-			GB_mmu.mbc1.rombank = GB_mmu.mbc1.rombank & 0x60; // Por que isso é feito?
-			GB_mmu.mbc1.rombank = GB_mmu.mbc1.rombank | val;
+			gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank & 0x60; // Por que isso é feito?
+			gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank | val;
 
-			GB_mmu.romoffset = GB_mmu.mbc1.rombank * 0x4000;
+			gb_mmu.romoffset = gb_mmu.mbc1.rombank * 0x4000;
 
 			break;
 		}
@@ -209,17 +209,17 @@ void wrByte(uint16_t addr, uint8_t val) {
 
 	case 0x4000:
 	case 0x5000:
-		switch (GB_mmu.carttype) {
+		switch (gb_mmu.carttype) {
 		case 3:
 			val = val & 0x3;
-			if (GB_mmu.mbc1.mode) {
-				GB_mmu.mbc1.rambank = val;
-				GB_mmu.ramoffset = GB_mmu.mbc1.rambank * 0x2000;// Por que esse offset?
+			if (gb_mmu.mbc1.mode) {
+				gb_mmu.mbc1.rambank = val;
+				gb_mmu.ramoffset = gb_mmu.mbc1.rambank * 0x2000;// Por que esse offset?
 			}
 			else {
-				GB_mmu.mbc1.rombank = GB_mmu.mbc1.rombank & 0x1F;
-				GB_mmu.mbc1.rombank = GB_mmu.mbc1.rombank | val;
-				GB_mmu.romoffset = GB_mmu.mbc1.rombank * 0x4000;
+				gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank & 0x1F;
+				gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank | val;
+				gb_mmu.romoffset = gb_mmu.mbc1.rombank * 0x4000;
 			}
 			break;
 		}
@@ -227,10 +227,10 @@ void wrByte(uint16_t addr, uint8_t val) {
 
 	case 0x6000:
 	case 0x7000:
-		switch (GB_mmu.carttype) {
+		switch (gb_mmu.carttype) {
 		case 3:
 			val = val & 0x1;
-			GB_mmu.mbc1.mode = val;
+			gb_mmu.mbc1.mode = val;
 			break;
 		}
 		break;
@@ -238,7 +238,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 		// Video RAM
 	case 0x8000:
 	case 0x9000:
-		GB_mmu.vram[addr & 0x1FFF] = val;
+		gb_mmu.vram[addr & 0x1FFF] = val;
 		//updatetile(addr & 0x1FFF, val); // GPU
 		// É necessário implementar a GPU!!
 		break;
@@ -246,14 +246,14 @@ void wrByte(uint16_t addr, uint8_t val) {
 		// External RAM
 	case 0xA000:
 	case 0xB000:
-		GB_mmu.eram[GB_mmu.ramoffset + (addr & 0x1FFF)] = val;
+		gb_mmu.eram[gb_mmu.ramoffset + (addr & 0x1FFF)] = val;
 		break;
 
 		// Internal RAM
 	case 0xC000:
 	case 0xD000:
 	case 0xE000:
-		GB_mmu.wram[addr & 0x1FFF] = val;
+		gb_mmu.wram[addr & 0x1FFF] = val;
 		break;
 
 	case 0xF000:
@@ -262,7 +262,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 		case 0x400: case 0x500: case 0x600: case 0x700:
 		case 0x800: case 0x900: case 0xA00: case 0xB00:
 		case 0xC00: case 0xD00:
-			GB_mmu.wram[addr & 0x1FFF] = val;
+			gb_mmu.wram[addr & 0x1FFF] = val;
 			break;
 
 			/* Dependem da GPU e KEY */
@@ -272,7 +272,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 			//porém ao comparar com o código do tutorial, está diferente.
 		case 0xE00:
 			if ((addr & 0xFF) < 0x9F) {
-				GB_mmu.oam[addr & 0xFF] = val;
+				gb_mmu.oam[addr & 0xFF] = val;
 				//updateoam(addr, val); // GPU
 			}
 			break;
@@ -280,10 +280,10 @@ void wrByte(uint16_t addr, uint8_t val) {
 			// Zeropage RAM, I/O, interrupts
 		case 0xF00:
 			if (addr == 0xFFFF)
-				GB_mmu.ie = val;
+				gb_mmu.ie = val;
 			// Zero page is 128 bytes
 			if (addr >= 0xFF80) {
-				GB_mmu.zram[addr & 0x7F] = val;
+				gb_mmu.zram[addr & 0x7F] = val;
 			}
 			else {
 				// I/O control handling
@@ -313,33 +313,33 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 	case 0x1000:
 	case 0x2000:
 	case 0x3000:
-		return &GB_mmu.rom[addr];
+		return &gb_mmu.rom[addr];
 
 		// ROM 1 (Unbanked) (16k)
 	case 0x4000:
 	case 0x5000:
 	case 0x6000:
 	case 0x7000:
-		return &GB_mmu.rom[addr];
+		return &gb_mmu.rom[addr];
 
 		// Graphics: VRAM (8k)
 	case 0x8000:
 	case 0x9000:
-		return &GB_mmu.vram[addr & MEM8K];
+		return &gb_mmu.vram[addr & MEM8K];
 
 		// External RAM (8k)
 	case 0xA000:
 	case 0xB000:
-		return &GB_mmu.eram[addr & MEM8K];
+		return &gb_mmu.eram[addr & MEM8K];
 
 		// Working RAM (8k)
 	case 0xC000:
 	case 0xD000:
-		return &GB_mmu.wram[addr & MEM8K];
+		return &gb_mmu.wram[addr & MEM8K];
 
 		// Working RAM shadow
 	case 0xE000:
-		return &GB_mmu.wram[addr & MEM8K];
+		return &gb_mmu.wram[addr & MEM8K];
 
 		// Working RAM shadow, I/O, Zero Page RAM
 	case 0xF000:
@@ -349,19 +349,19 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 		case 0x0400: case 0x0500: case 0x0600: case 0x0700:
 		case 0x0800: case 0x0900: case 0x0A00: case 0x0B00:
 		case 0x0C00: case 0x0D00:
-			return &GB_mmu.wram[addr & MEM8K];
+			return &gb_mmu.wram[addr & MEM8K];
 		
 		case 0x0E00:
-			return &GB_mmu.oam[addr & 0xFF];
+			return &gb_mmu.oam[addr & 0xFF];
 
 			// Zero page
 		case 0x0F00:
 			if (addr == 0xFFFF) {
-				return &GB_mmu.ie;
+				return &gb_mmu.ie;
 			}
 			// Zero page is 128 bytes
 			if (addr >= 0xFF80) {
-				return &GB_mmu.zram[addr & 0x7F];
+				return &gb_mmu.zram[addr & 0x7F];
 			}
 			else {
 				// I/O control handling
