@@ -1,7 +1,8 @@
 #include "lcd.h"
 
 // Source: http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html
-
+// Many improvements can be made to speed up this process. This is
+// just a temporary solution to test tile emulation.
 
 /*----- Variables -----*/
 static int16_t scanline_counter;
@@ -205,14 +206,39 @@ void LCD_renderTiles() {
 
 		// Colour from palette 0xFF47 (BGP - Background Palette)
 		uint8_t col = LCD_getColour(colour_num, gb_lcd.bgp);
-
+		
+		// Set pixel into buffer.
+		uint16_t pixel_pos = gb_lcd.ly * LCD_WIDTH + pixel;
+		gb_lcd.buffer[pixel_pos] = col;
 	}
 }
-void LCD_renderSprites()
-{
+void LCD_renderSprites() {
 }
 
-uint8_t LCD_getColour(uint8_t col, uint8_t palette)
-{
-	return uint8_t();
+uint8_t LCD_getColour(uint8_t col, uint8_t palette)	{
+	uint8_t res = WHITE;
+	
+	uint8_t hi = 0, lo = 0;
+
+	// Which bits of the colour palette does the colour id map to?
+	switch (col) {
+		case 0: hi = 1; lo = 0; break;
+		case 1: hi = 3; lo = 2; break;
+		case 2: hi = 5; lo = 4; break;
+		case 3: hi = 7; lo = 6; break;
+	}
+
+	// use the palette to get the colour;
+	uint8_t colour = 0;
+	colour = palette >> (hi - 1);
+	colour |= palette >> lo;
+
+	switch (colour) {
+		case 0: res = WHITE; break;
+		case 1: res = LIGHT_GRAY; break;
+		case 2: res = DARK_GRAY; break;
+		case 3: res = BLACK; break;
+	}
+
+	return res;
 }

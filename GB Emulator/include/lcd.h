@@ -19,17 +19,20 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 144
 
+// Colors
 #define WHITE		0xFF
-#define LIGHT_GRAY  0x
-#define DARK_GRAY
-#define BLACK
+#define LIGHT_GRAY  0xCC
+#define DARK_GRAY	0x77
+#define BLACK		0x00
+
 // VRAM offsets
 #define LCD_TILE_DATA_1 0x0
 #define LCD_TILE_DATA_2 0x800
 
 #define LCD_BG_MEM_0 0x1800
 #define LCD_BG_MEM_1 0x1C00
-// LCD registers
+
+// LCD registers adresses in memory
 #define LCD_LCDC 0xFF40
 #define LCD_STAT 0xFF41
 #define LCD_SCY  0xFF42
