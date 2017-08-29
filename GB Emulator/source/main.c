@@ -15,9 +15,10 @@
 /* Debug Includes */
 #include "debug.h"
 
-/*----- Defines -----*/
-#define GB_CLOCK 4194304
-#define MAXCYCLES 69905 // GB_CLOCK / Frame Rate (60Hz)
+/* Defines */
+
+
+/*---------*/
 
 bool loadROM(char * filename) {
 	uint32_t size;
@@ -73,9 +74,21 @@ void printOAM() {
 	}
 }
 
+void emulatorInit(void) {
+	CPU_init();
+}
 
+void emulateCycle(void) {
+	while (1)
+		CPU_cycle();
+}
+
+char* filename = "C:\\Users\\caiox\\Documents\\Emulators\\GB\\ROMs\\Tetris\\Tetris.gb";
 
 void main() {
+	loadROM(filename);
+	emulatorInit();
+	emulateCycle();
 
 }
 

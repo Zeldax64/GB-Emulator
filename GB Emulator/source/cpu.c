@@ -2,15 +2,25 @@
 
 #include "cpu.h"
 
+
+const void(*instructions[0x100])();
+const void(*CBinstructions[0x100])();
+
 /*----- CPU Init function -----*/
 // Verify GB's cpu initialization
-void CPU_init() {
+void CPU_init(void) {
 	gb_cpu.pc = 0x100;
 	gb_cpu.af = 0x01B0;
 	gb_cpu.bc = 0x0013;
 	gb_cpu.de = 0x00D8;
 	gb_cpu.hl = 0x014D;
 	gb_cpu.sp = 0xFFFE;
+}
+
+void CPU_cycle(void) {
+	uint8_t op = rdByte(gb_cpu.pc);
+	printf("OP: %x\n", op);
+	(*instructions[op])();
 }
 
 /*----- Flag calculator functions -----*/
@@ -65,112 +75,112 @@ void flagZ16(uint16_t val) {
 void LDrr(uint8_t *reg1, uint8_t *reg2) { *(reg1) = *(reg2); gb_cpu.pc++; gb_cpu.m++; }  // LD r, r'
 
 // LDAr
-void LDAA() { LDrr(&gb_cpu.a, &gb_cpu.a); }
-void LDAB() { LDrr(&gb_cpu.a, &gb_cpu.b); }
-void LDAC() { LDrr(&gb_cpu.a, &gb_cpu.c); }
-void LDAD() { LDrr(&gb_cpu.a, &gb_cpu.d); }
-void LDAE() { LDrr(&gb_cpu.a, &gb_cpu.e); }
-void LDAH() { LDrr(&gb_cpu.a, &gb_cpu.h); }
-void LDAL() { LDrr(&gb_cpu.a, &gb_cpu.l); }
+void LDaa() { LDrr(&gb_cpu.a, &gb_cpu.a); }
+void LDab() { LDrr(&gb_cpu.a, &gb_cpu.b); }
+void LDac() { LDrr(&gb_cpu.a, &gb_cpu.c); }
+void LDad() { LDrr(&gb_cpu.a, &gb_cpu.d); }
+void LDae() { LDrr(&gb_cpu.a, &gb_cpu.e); }
+void LDah() { LDrr(&gb_cpu.a, &gb_cpu.h); }
+void LDal() { LDrr(&gb_cpu.a, &gb_cpu.l); }
 
 // LDBr
-void LDBA() { LDrr(&gb_cpu.b, &gb_cpu.a); }
-void LDBB() { LDrr(&gb_cpu.b, &gb_cpu.b); }
-void LDBC() { LDrr(&gb_cpu.b, &gb_cpu.c); }
-void LDBD() { LDrr(&gb_cpu.b, &gb_cpu.d); }
-void LDBE() { LDrr(&gb_cpu.b, &gb_cpu.e); }
-void LDBH() { LDrr(&gb_cpu.b, &gb_cpu.h); }
-void LDBL() { LDrr(&gb_cpu.b, &gb_cpu.l); }
+void LDba() { LDrr(&gb_cpu.b, &gb_cpu.a); }
+void LDbb() { LDrr(&gb_cpu.b, &gb_cpu.b); }
+void LDbc() { LDrr(&gb_cpu.b, &gb_cpu.c); }
+void LDbd() { LDrr(&gb_cpu.b, &gb_cpu.d); }
+void LDbe() { LDrr(&gb_cpu.b, &gb_cpu.e); }
+void LDbh() { LDrr(&gb_cpu.b, &gb_cpu.h); }
+void LDbl() { LDrr(&gb_cpu.b, &gb_cpu.l); }
 
 // LDCr
-void LDCA() { LDrr(&gb_cpu.c, &gb_cpu.a); }
-void LDCB() { LDrr(&gb_cpu.c, &gb_cpu.b); }
-void LDCC() { LDrr(&gb_cpu.c, &gb_cpu.c); }
-void LDCD() { LDrr(&gb_cpu.c, &gb_cpu.d); }
-void LDCE() { LDrr(&gb_cpu.c, &gb_cpu.e); }
-void LDCH() { LDrr(&gb_cpu.c, &gb_cpu.h); }
-void LDCL() { LDrr(&gb_cpu.c, &gb_cpu.l); }
+void LDca() { LDrr(&gb_cpu.c, &gb_cpu.a); }
+void LDcb() { LDrr(&gb_cpu.c, &gb_cpu.b); }
+void LDcc() { LDrr(&gb_cpu.c, &gb_cpu.c); }
+void LDcd() { LDrr(&gb_cpu.c, &gb_cpu.d); }
+void LDce() { LDrr(&gb_cpu.c, &gb_cpu.e); }
+void LDch() { LDrr(&gb_cpu.c, &gb_cpu.h); }
+void LDcl() { LDrr(&gb_cpu.c, &gb_cpu.l); }
 
 // LDDr
-void LDDA() { LDrr(&gb_cpu.d, &gb_cpu.a); }
-void LDDB() { LDrr(&gb_cpu.d, &gb_cpu.b); }
-void LDDC() { LDrr(&gb_cpu.d, &gb_cpu.c); }
-void LDDD() { LDrr(&gb_cpu.d, &gb_cpu.d); }
-void LDDE() { LDrr(&gb_cpu.d, &gb_cpu.e); }
-void LDDH() { LDrr(&gb_cpu.d, &gb_cpu.h); }
-void LDDL() { LDrr(&gb_cpu.d, &gb_cpu.l); }
+void LDda() { LDrr(&gb_cpu.d, &gb_cpu.a); }
+void LDdb() { LDrr(&gb_cpu.d, &gb_cpu.b); }
+void LDdc() { LDrr(&gb_cpu.d, &gb_cpu.c); }
+void LDdd() { LDrr(&gb_cpu.d, &gb_cpu.d); }
+void LDde() { LDrr(&gb_cpu.d, &gb_cpu.e); }
+void LDdh() { LDrr(&gb_cpu.d, &gb_cpu.h); }
+void LDdl() { LDrr(&gb_cpu.d, &gb_cpu.l); }
 
 // LDEr
-void LDEA() { LDrr(&gb_cpu.e, &gb_cpu.a); }
-void LDEB() { LDrr(&gb_cpu.e, &gb_cpu.b); }
-void LDEC() { LDrr(&gb_cpu.e, &gb_cpu.c); }
-void LDED() { LDrr(&gb_cpu.e, &gb_cpu.d); }
-void LDEE() { LDrr(&gb_cpu.e, &gb_cpu.e); }
-void LDEH() { LDrr(&gb_cpu.e, &gb_cpu.h); }
-void LDEL() { LDrr(&gb_cpu.e, &gb_cpu.l); }
+void LDea() { LDrr(&gb_cpu.e, &gb_cpu.a); }
+void LDeb() { LDrr(&gb_cpu.e, &gb_cpu.b); }
+void LDec() { LDrr(&gb_cpu.e, &gb_cpu.c); }
+void LDed() { LDrr(&gb_cpu.e, &gb_cpu.d); }
+void LDee() { LDrr(&gb_cpu.e, &gb_cpu.e); }
+void LDeh() { LDrr(&gb_cpu.e, &gb_cpu.h); }
+void LDel() { LDrr(&gb_cpu.e, &gb_cpu.l); }
 
 // LDHr
-void LDHA() { LDrr(&gb_cpu.h, &gb_cpu.a); }
-void LDHB() { LDrr(&gb_cpu.h, &gb_cpu.b); }
-void LDHC() { LDrr(&gb_cpu.h, &gb_cpu.c); }
-void LDHD() { LDrr(&gb_cpu.h, &gb_cpu.d); }
-void LDHE() { LDrr(&gb_cpu.h, &gb_cpu.e); }
-void LDHH() { LDrr(&gb_cpu.h, &gb_cpu.h); }
-void LDHL() { LDrr(&gb_cpu.h, &gb_cpu.l); }
+void LDha() { LDrr(&gb_cpu.h, &gb_cpu.a); }
+void LDhb() { LDrr(&gb_cpu.h, &gb_cpu.b); }
+void LDhc() { LDrr(&gb_cpu.h, &gb_cpu.c); }
+void LDhd() { LDrr(&gb_cpu.h, &gb_cpu.d); }
+void LDhe() { LDrr(&gb_cpu.h, &gb_cpu.e); }
+void LDhh() { LDrr(&gb_cpu.h, &gb_cpu.h); }
+void LDhl() { LDrr(&gb_cpu.h, &gb_cpu.l); }
 
 // LDLr
-void LDLA() { LDrr(&gb_cpu.l, &gb_cpu.a); }
-void LDLB() { LDrr(&gb_cpu.l, &gb_cpu.b); }
-void LDLC() { LDrr(&gb_cpu.l, &gb_cpu.c); }
-void LDLD() { LDrr(&gb_cpu.l, &gb_cpu.d); }
-void LDLE() { LDrr(&gb_cpu.l, &gb_cpu.e); }
-void LDLH() { LDrr(&gb_cpu.l, &gb_cpu.h); }
-void LDLL() { LDrr(&gb_cpu.l, &gb_cpu.l); }
+void LDla() { LDrr(&gb_cpu.l, &gb_cpu.a); }
+void LDlb() { LDrr(&gb_cpu.l, &gb_cpu.b); }
+void LDlc() { LDrr(&gb_cpu.l, &gb_cpu.c); }
+void LDld() { LDrr(&gb_cpu.l, &gb_cpu.d); }
+void LDle() { LDrr(&gb_cpu.l, &gb_cpu.e); }
+void LDlh() { LDrr(&gb_cpu.l, &gb_cpu.h); }
+void LDll() { LDrr(&gb_cpu.l, &gb_cpu.l); }
 
 // End
 
 // LDrn instructions expansion to all possibilities of r.
 void LDrn(uint8_t *reg) { *(reg) = rdByte(++gb_cpu.pc); gb_cpu.pc++; gb_cpu.m += 2; }	   // LD r,n
 
-void LDAn(uint8_t * reg){ LDrn(&gb_cpu.a); }
-void LDBn(uint8_t * reg){ LDrn(&gb_cpu.b); }
-void LDCn(uint8_t * reg){ LDrn(&gb_cpu.c); }
-void LDDn(uint8_t * reg){ LDrn(&gb_cpu.d); }
-void LDEn(uint8_t * reg){ LDrn(&gb_cpu.e); }
-void LDHn(uint8_t * reg){ LDrn(&gb_cpu.h); }
-void LDLn(uint8_t * reg){ LDrn(&gb_cpu.l); }
+void LDan(uint8_t * reg){ LDrn(&gb_cpu.a); }
+void LDbn(uint8_t * reg){ LDrn(&gb_cpu.b); }
+void LDcn(uint8_t * reg){ LDrn(&gb_cpu.c); }
+void LDdn(uint8_t * reg){ LDrn(&gb_cpu.d); }
+void LDen(uint8_t * reg){ LDrn(&gb_cpu.e); }
+void LDhn(uint8_t * reg){ LDrn(&gb_cpu.h); }
+void LDln(uint8_t * reg){ LDrn(&gb_cpu.l); }
 
 // End
 
 // LDr(HL) instructions expansion to all possibilities of r.
 void LDrHLm(uint8_t *reg) { *(reg) = rdByte(gb_cpu.hl); gb_cpu.pc++; gb_cpu.m += 2; }		   // LD r,(HL)
 
-void LDAHLm(uint8_t *reg) { LDrHLm(&gb_cpu.a); }
-void LDBHLm(uint8_t *reg) { LDrHLm(&gb_cpu.b); }
-void LDCHLm(uint8_t *reg) { LDrHLm(&gb_cpu.c); }
-void LDDHLm(uint8_t *reg) { LDrHLm(&gb_cpu.d); }
-void LDEHLm(uint8_t *reg) { LDrHLm(&gb_cpu.e); }
-void LDHHLm(uint8_t *reg) { LDrHLm(&gb_cpu.h); }
-void LDLHLm(uint8_t *reg) { LDrHLm(&gb_cpu.l); }
+void LDaHLm(uint8_t *reg) { LDrHLm(&gb_cpu.a); }
+void LDbHLm(uint8_t *reg) { LDrHLm(&gb_cpu.b); }
+void LDcHLm(uint8_t *reg) { LDrHLm(&gb_cpu.c); }
+void LDdHLm(uint8_t *reg) { LDrHLm(&gb_cpu.d); }
+void LDeHLm(uint8_t *reg) { LDrHLm(&gb_cpu.e); }
+void LDhHLm(uint8_t *reg) { LDrHLm(&gb_cpu.h); }
+void LDlHLm(uint8_t *reg) { LDrHLm(&gb_cpu.l); }
 
 // End
 
 // LD(HL)r instructions expansion to all possibilities of r.
 void LDHLmr(uint8_t reg) { wrByte(gb_cpu.hl, reg); gb_cpu.pc++; gb_cpu.m += 2; } // LD (HL), r
 
-void LDHLmA(uint8_t reg) { LDHLmr(gb_cpu.a); }
-void LDHLmB(uint8_t reg) { LDHLmr(gb_cpu.b); }
-void LDHLmC(uint8_t reg) { LDHLmr(gb_cpu.c); }
-void LDHLmD(uint8_t reg) { LDHLmr(gb_cpu.d); }
-void LDHLmE(uint8_t reg) { LDHLmr(gb_cpu.e); }
-void LDHLmH(uint8_t reg) { LDHLmr(gb_cpu.h); }
-void LDHLmL(uint8_t reg) { LDHLmr(gb_cpu.l); }
+void LDHLma(uint8_t reg) { LDHLmr(gb_cpu.a); }
+void LDHLmb(uint8_t reg) { LDHLmr(gb_cpu.b); }
+void LDHLmc(uint8_t reg) { LDHLmr(gb_cpu.c); }
+void LDHLmd(uint8_t reg) { LDHLmr(gb_cpu.d); }
+void LDHLme(uint8_t reg) { LDHLmr(gb_cpu.e); }
+void LDHLmh(uint8_t reg) { LDHLmr(gb_cpu.h); }
+void LDHLml(uint8_t reg) { LDHLmr(gb_cpu.l); }
 
 // End
 
-void LDHLn() { wrByte(gb_cpu.hl, rdByte(++gb_cpu.pc)); gb_cpu.pc++; gb_cpu.m += 3; }		   // LD (HL), n
-void LDABC() { gb_cpu.a = rdByte(gb_cpu.bc); gb_cpu.pc++; gb_cpu.m += 2; }					   // LD A, (BC)
-void LDADE() { gb_cpu.a = rdByte(gb_cpu.de); gb_cpu.pc++;	gb_cpu.m += 2; }				   // LD A, (DE)
+void LDHLmn() { wrByte(gb_cpu.hl, rdByte(++gb_cpu.pc)); gb_cpu.pc++; gb_cpu.m += 3; }		   // LD (HL), n
+void LDABCm() { gb_cpu.a = rdByte(gb_cpu.bc); gb_cpu.pc++; gb_cpu.m += 2; }					   // LD A, (BC)
+void LDADEm() { gb_cpu.a = rdByte(gb_cpu.de); gb_cpu.pc++;	gb_cpu.m += 2; }				   // LD A, (DE)
 void LDACm() { gb_cpu.a = rdByte(gb_cpu.c + 0xFF00); gb_cpu.pc++; gb_cpu.m += 2; }			   // LD A, (C)
 void LDCmA() { wrByte(gb_cpu.c + 0xFF00, gb_cpu.a); gb_cpu.pc++; gb_cpu.m += 2; }			   // LD (C), A
 void LDAnm() { gb_cpu.a = rdByte(++gb_cpu.pc); gb_cpu.pc++; gb_cpu.m += 3; }					   // LD A, (n)
@@ -188,6 +198,7 @@ void LDHLDmA() { wrByte(gb_cpu.hl, gb_cpu.a); gb_cpu.hl--; gb_cpu.pc++; gb_cpu.m
 // LDddnn instructions expansion to all possibilities of dd.
 void LDddnn(uint16_t *reg) { *(reg) = rdWord(gb_cpu.pc++); gb_cpu.pc += 2; gb_cpu.m += 3;}	  // LD dd, nn
 
+void LDBCnn(uint16_t *reg) { LDddnn(&gb_cpu.bc); }
 void LDDEnn(uint16_t *reg) { LDddnn(&gb_cpu.de); }
 void LDHLnn(uint16_t *reg) { LDddnn(&gb_cpu.hl); }
 void LDSPnn(uint16_t *reg) { LDddnn(&gb_cpu.sp); }
@@ -253,13 +264,13 @@ void ADDAr(uint8_t reg) { // ADD A, r
 	gb_cpu.pc++;
 }
 
-void ADDAA(uint8_t reg) { ADDAr(gb_cpu.a); }
-void ADDAB(uint8_t reg) { ADDAr(gb_cpu.b); }
-void ADDAC(uint8_t reg) { ADDAr(gb_cpu.c); }
-void ADDAD(uint8_t reg) { ADDAr(gb_cpu.d); }
-void ADDAE(uint8_t reg) { ADDAr(gb_cpu.e); }
-void ADDAH(uint8_t reg) { ADDAr(gb_cpu.h); }
-void ADDAL(uint8_t reg) { ADDAr(gb_cpu.l); }
+void ADDAa(uint8_t reg) { ADDAr(gb_cpu.a); }
+void ADDAb(uint8_t reg) { ADDAr(gb_cpu.b); }
+void ADDAc(uint8_t reg) { ADDAr(gb_cpu.c); }
+void ADDAd(uint8_t reg) { ADDAr(gb_cpu.d); }
+void ADDAe(uint8_t reg) { ADDAr(gb_cpu.e); }
+void ADDAh(uint8_t reg) { ADDAr(gb_cpu.h); }
+void ADDAl(uint8_t reg) { ADDAr(gb_cpu.l); }
 
 // End
 
@@ -307,13 +318,13 @@ void ADCAr(uint8_t reg) { // ADC A, r
 	gb_cpu.pc++;
 }
 
-void ADCAA(uint8_t reg) { ADCAr(gb_cpu.a); }
-void ADCAB(uint8_t reg) { ADCAr(gb_cpu.b); }
-void ADCAC(uint8_t reg) { ADCAr(gb_cpu.c); }
-void ADCAD(uint8_t reg) { ADCAr(gb_cpu.d); }
-void ADCAE(uint8_t reg) { ADCAr(gb_cpu.e); }
-void ADCAH(uint8_t reg) { ADCAr(gb_cpu.h); }
-void ADCAL(uint8_t reg) { ADCAr(gb_cpu.l); }
+void ADCAa(uint8_t reg) { ADCAr(gb_cpu.a); }
+void ADCAb(uint8_t reg) { ADCAr(gb_cpu.b); }
+void ADCAc(uint8_t reg) { ADCAr(gb_cpu.c); }
+void ADCAd(uint8_t reg) { ADCAr(gb_cpu.d); }
+void ADCAe(uint8_t reg) { ADCAr(gb_cpu.e); }
+void ADCAh(uint8_t reg) { ADCAr(gb_cpu.h); }
+void ADCAl(uint8_t reg) { ADCAr(gb_cpu.l); }
 
 // End
 
@@ -369,13 +380,13 @@ void SUBr(uint8_t reg) { // SUB r
 	gb_cpu.pc++;
 }
 
-void SUBA(uint8_t reg) { SUBr(gb_cpu.a); }
-void SUBB(uint8_t reg) { SUBr(gb_cpu.b); }
-void SUBC(uint8_t reg) { SUBr(gb_cpu.c); }
-void SUBD(uint8_t reg) { SUBr(gb_cpu.d); }
-void SUBE(uint8_t reg) { SUBr(gb_cpu.e); }
-void SUBH(uint8_t reg) { SUBr(gb_cpu.h); }
-void SUBL(uint8_t reg) { SUBr(gb_cpu.l); }
+void SUBa(uint8_t reg) { SUBr(gb_cpu.a); }
+void SUBb(uint8_t reg) { SUBr(gb_cpu.b); }
+void SUBc(uint8_t reg) { SUBr(gb_cpu.c); }
+void SUBd(uint8_t reg) { SUBr(gb_cpu.d); }
+void SUBe(uint8_t reg) { SUBr(gb_cpu.e); }
+void SUBh(uint8_t reg) { SUBr(gb_cpu.h); }
+void SUBl(uint8_t reg) { SUBr(gb_cpu.l); }
 
 // End
 
@@ -424,13 +435,13 @@ void SBCAr(uint8_t reg) {  // SBC A, r
 	gb_cpu.pc++;
 }
 
-void SBCAA(uint8_t reg) { SBCAr(gb_cpu.a); }
-void SBCAB(uint8_t reg) { SBCAr(gb_cpu.b); }
-void SBCAC(uint8_t reg) { SBCAr(gb_cpu.c); }
-void SBCAD(uint8_t reg) { SBCAr(gb_cpu.d); }
-void SBCAE(uint8_t reg) { SBCAr(gb_cpu.e); }
-void SBCAH(uint8_t reg) { SBCAr(gb_cpu.h); }
-void SBCAL(uint8_t reg) { SBCAr(gb_cpu.l); }
+void SBCAa(uint8_t reg) { SBCAr(gb_cpu.a); }
+void SBCAb(uint8_t reg) { SBCAr(gb_cpu.b); }
+void SBCAc(uint8_t reg) { SBCAr(gb_cpu.c); }
+void SBCAd(uint8_t reg) { SBCAr(gb_cpu.d); }
+void SBCAe(uint8_t reg) { SBCAr(gb_cpu.e); }
+void SBCAh(uint8_t reg) { SBCAr(gb_cpu.h); }
+void SBCAl(uint8_t reg) { SBCAr(gb_cpu.l); }
 
 // End
 
@@ -479,13 +490,13 @@ void ANDr(uint8_t reg) {  // AND r
 	gb_cpu.pc++;
 }
 
-void ANDA(uint8_t reg) { ANDr(gb_cpu.a); }
-void ANDB(uint8_t reg) { ANDr(gb_cpu.b); }
-void ANDC(uint8_t reg) { ANDr(gb_cpu.c); }
-void ANDD(uint8_t reg) { ANDr(gb_cpu.d); }
-void ANDE(uint8_t reg) { ANDr(gb_cpu.e); }
-void ANDH(uint8_t reg) { ANDr(gb_cpu.h); }
-void ANDL(uint8_t reg) { ANDr(gb_cpu.l); }
+void ANDa(uint8_t reg) { ANDr(gb_cpu.a); }
+void ANDb(uint8_t reg) { ANDr(gb_cpu.b); }
+void ANDc(uint8_t reg) { ANDr(gb_cpu.c); }
+void ANDd(uint8_t reg) { ANDr(gb_cpu.d); }
+void ANDe(uint8_t reg) { ANDr(gb_cpu.e); }
+void ANDh(uint8_t reg) { ANDr(gb_cpu.h); }
+void ANDl(uint8_t reg) { ANDr(gb_cpu.l); }
 
 // End
 
@@ -519,13 +530,13 @@ void ORr(uint8_t reg) {  // OR r
 	gb_cpu.pc++;
 }
 
-void ORA(uint8_t reg) { ORr(gb_cpu.a); }
-void ORB(uint8_t reg) { ORr(gb_cpu.b); }
-void ORC(uint8_t reg) { ORr(gb_cpu.c); }
-void ORD(uint8_t reg) { ORr(gb_cpu.d); }
-void ORE(uint8_t reg) { ORr(gb_cpu.e); }
-void ORH(uint8_t reg) { ORr(gb_cpu.h); }
-void ORL(uint8_t reg) { ORr(gb_cpu.l); }
+void ORa(uint8_t reg) { ORr(gb_cpu.a); }
+void ORb(uint8_t reg) { ORr(gb_cpu.b); }
+void ORc(uint8_t reg) { ORr(gb_cpu.c); }
+void ORd(uint8_t reg) { ORr(gb_cpu.d); }
+void ORe(uint8_t reg) { ORr(gb_cpu.e); }
+void ORh(uint8_t reg) { ORr(gb_cpu.h); }
+void ORl(uint8_t reg) { ORr(gb_cpu.l); }
 
 // End
 
@@ -557,13 +568,13 @@ void XORr(uint8_t reg) {  // XOR r
 	gb_cpu.pc++;
 }
 
-void XORA(uint8_t reg) { XORr(gb_cpu.a); }
-void XORB(uint8_t reg) { XORr(gb_cpu.b); }
-void XORC(uint8_t reg) { XORr(gb_cpu.c); }
-void XORD(uint8_t reg) { XORr(gb_cpu.d); }
-void XORE(uint8_t reg) { XORr(gb_cpu.e); }
-void XORH(uint8_t reg) { XORr(gb_cpu.h); }
-void XORL(uint8_t reg) { XORr(gb_cpu.l); }
+void XORa(uint8_t reg) { XORr(gb_cpu.a); }
+void XORb(uint8_t reg) { XORr(gb_cpu.b); }
+void XORc(uint8_t reg) { XORr(gb_cpu.c); }
+void XORd(uint8_t reg) { XORr(gb_cpu.d); }
+void XORe(uint8_t reg) { XORr(gb_cpu.e); }
+void XORh(uint8_t reg) { XORr(gb_cpu.h); }
+void XORl(uint8_t reg) { XORr(gb_cpu.l); }
 
 // End
 
@@ -602,13 +613,13 @@ void CPr(uint8_t reg) {
 	gb_cpu.pc++;
 }
 
-void CPA(uint8_t reg) { CPr(gb_cpu.a); }
-void CPB(uint8_t reg) { CPr(gb_cpu.b); }
-void CPC(uint8_t reg) { CPr(gb_cpu.c); }
-void CPD(uint8_t reg) { CPr(gb_cpu.d); }
-void CPE(uint8_t reg) { CPr(gb_cpu.e); }
-void CPH(uint8_t reg) { CPr(gb_cpu.h); }
-void CPLr(uint8_t reg) { CPr(gb_cpu.l); }
+void CPa(uint8_t reg) { CPr(gb_cpu.a); }
+void CPb(uint8_t reg) { CPr(gb_cpu.b); }
+void CPc(uint8_t reg) { CPr(gb_cpu.c); }
+void CPd(uint8_t reg) { CPr(gb_cpu.d); }
+void CPe(uint8_t reg) { CPr(gb_cpu.e); }
+void CPh(uint8_t reg) { CPr(gb_cpu.h); }
+void CPl(uint8_t reg) { CPr(gb_cpu.l); }
 
 // End
 
@@ -649,13 +660,13 @@ void INCr(uint8_t *reg) {
 	gb_cpu.pc++;
 }
 
-void INCA(uint8_t *reg) { INCr(&gb_cpu.a); }
-void INCB(uint8_t *reg) { INCr(&gb_cpu.b); }
-void INCC(uint8_t *reg) { INCr(&gb_cpu.c); }
-void INCD(uint8_t *reg) { INCr(&gb_cpu.d); }
-void INCE(uint8_t *reg) { INCr(&gb_cpu.e); }
-void INCH(uint8_t *reg) { INCr(&gb_cpu.h); }
-void INCL(uint8_t *reg) { INCr(&gb_cpu.l); }
+void INCa(uint8_t *reg) { INCr(&gb_cpu.a); }
+void INCb(uint8_t *reg) { INCr(&gb_cpu.b); }
+void INCc(uint8_t *reg) { INCr(&gb_cpu.c); }
+void INCd(uint8_t *reg) { INCr(&gb_cpu.d); }
+void INCe(uint8_t *reg) { INCr(&gb_cpu.e); }
+void INCh(uint8_t *reg) { INCr(&gb_cpu.h); }
+void INCl(uint8_t *reg) { INCr(&gb_cpu.l); }
 
 // End
 
@@ -684,13 +695,13 @@ void DECr(uint8_t *reg) {
 	gb_cpu.pc++;
 }
 
-void DECA(uint8_t *reg) { DECr(&gb_cpu.a); }
-void DECB(uint8_t *reg) { DECr(&gb_cpu.b); }
-void DECC(uint8_t *reg) { DECr(&gb_cpu.c); }
-void DECD(uint8_t *reg) { DECr(&gb_cpu.d); }
-void DECE(uint8_t *reg) { DECr(&gb_cpu.e); }
-void DECH(uint8_t *reg) { DECr(&gb_cpu.h); }
-void DECL(uint8_t *reg) { DECr(&gb_cpu.l); }
+void DECa(uint8_t *reg) { DECr(&gb_cpu.a); }
+void DECb(uint8_t *reg) { DECr(&gb_cpu.b); }
+void DECc(uint8_t *reg) { DECr(&gb_cpu.c); }
+void DECd(uint8_t *reg) { DECr(&gb_cpu.d); }
+void DECe(uint8_t *reg) { DECr(&gb_cpu.e); }
+void DECh(uint8_t *reg) { DECr(&gb_cpu.h); }
+void DECl(uint8_t *reg) { DECr(&gb_cpu.l); }
 
 // END
 
@@ -885,7 +896,7 @@ void RLl(uint8_t *reg) { RLr(&gb_cpu.l); }
 
 // End
 
-void RLHL() { // RL (HL)
+void RLHLm() { // RL (HL)
 	uint8_t m = rdByte(gb_cpu.hl);
 	uint8_t bitr = (m & 0x80) ? 1 : 0;
 	uint8_t carry = (gb_cpu.f & FLAGC) ? 1 : 0;
@@ -965,7 +976,7 @@ void RRl(uint8_t *reg) { RRr(&gb_cpu.l); }
 
 // End
 
-void RRHL() { // RR (HL)
+void RRHLm() { // RR (HL)
 	uint8_t m = rdByte(gb_cpu.hl);
 	uint8_t carry = (gb_cpu.f & FLAGC) ? 0x80 : 0;
 
@@ -1038,7 +1049,7 @@ void SRAl(uint8_t *reg) {SRAr(&gb_cpu.l); }
 
 // End
 
-void SRAHL() { // SRA (HL)
+void SRAHLm() { // SRA (HL)
 	uint8_t m = rdByte(gb_cpu.hl);
 	uint8_t bitr = m & 0x80;
 
@@ -1310,8 +1321,8 @@ void JRCe() {
 	}
 }
 
-void JPHL() { // JP (HL)
-	gb_cpu.pc = gb_cpu.hl;
+void JPHLm() { // JP (HL)
+	gb_cpu.pc = rdByte(gb_cpu.hl);
 	gb_cpu.m += 1;
 }
 
@@ -1442,6 +1453,7 @@ void RETC() {
 	}
 }
 
+// RST instructions expansion to all possibilities of values.
 void RST(uint8_t t) {
 	gb_cpu.sp -= 2;
 	wrWord(gb_cpu.sp, gb_cpu.pc + 1);
@@ -1449,6 +1461,17 @@ void RST(uint8_t t) {
 	gb_cpu.pc = t;
 	gb_cpu.m += 4;
 }
+
+void RST00() { RST(0x00); }
+void RST08() { RST(0x08); }
+void RST10() { RST(0x10); }
+void RST18() { RST(0x18); }
+void RST20() { RST(0x20); }
+void RST28() { RST(0x28); }
+void RST30() { RST(0x30); }
+void RST38() { RST(0x38); }
+
+// End
 
 /*----- General-Purpose Arithmetic Operations and CPU Control Instructions -----*/
 /*
@@ -1546,226 +1569,133 @@ HALT
 STOP
 */
 
+// Null instruction
+void CPU_NULL(void) {
 
-// Switch Statement 
-//
-//This function (CPU_cycle()) uses a switch statement approach to test the
-//instruction set. When I finish all tests the switch statement
-//will be replaced to a array of function pointers.
-//
-//void CPU_cycle() {
-//	uint16_t opcode = rdWord(gb_cpu.pc);
-//
-//	switch (opcode) {
-//		case 0x00: NOP(); break;
-//		case 0x01: LDddnn(&gb_cpu.bc); break;
-//		case 0x02: LDBCA(); break;
-//		case 0x03: INCss(&gb_cpu.bc); break;
-//		case 0x04: INCr(&gb_cpu.b); break;
-//		case 0x05: DECr(&gb_cpu.b); break;
-//		case 0x06: LDrn(&gb_cpu.b); break;
-//		case 0x07: RLCA(); break;
-//		case 0x08: LDnnSP(); break;
-//		case 0x09: ADDHLss(gb_cpu.bc); break;
-//		case 0x0A: LDABC(); break;
-//		case 0x0B: DECss(&gb_cpu.bc); break;
-//		case 0x0C: INCr(&gb_cpu.c); break;
-//		case 0x0D: DECr(&gb_cpu.c); break;
-//		case 0x0E: LDrn(gb_cpu.c); break;
-//		case 0x0F: RRCA(); break;
-//		case 0x10: STOP(); break;
-//		case 0x11: LDddnn(&gb_cpu.de); break;
-//		case 0x12: LDDEA(); break;
-//		case 0x13: INCss(&gb_cpu.de); break;
-//		case 0x14: INCr(&gb_cpu.d); break;
-//		case 0x15: DECr(&gb_cpu.d); break;
-//		case 0x16: LDrn(&gb_cpu.d); break;
-//		case 0x17: RLA(); break;
-//		case 0x18: JRe(); break;
-//		case 0x19: ADDHLss(gb_cpu.de); break;
-//		case 0x1A: LDADE(); break;
-//		case 0x1B: DECss(&gb_cpu.de); break;
-//		case 0x1C: INCr(&gb_cpu.e); break;
-//		case 0x1D: DECr(&gb_cpu.e); break;
-//		case 0x1E: LDrn(&gb_cpu.e); break;
-//		case 0x1F: RRA(); break;
-//		case 0x20: JRNZe(); break;
-//		case 0x21: LDddnn(&gb_cpu.hl); break;
-//		case 0x22: LDHLIA(); break;
-//		case 0x23: INCss(&gb_cpu.hl); break;
-//		case 0x24: INCr(&gb_cpu.h); break;
-//		case 0x25: DEC(&gb_cpu.h); break;
-//		case 0x26: LDrn(&gb_cpu.h); break;
-//		case 0x27: DAA(); break;
-//		case 0x28: JRZe(); break;
-//		case 0x29: ADDHLss(gb_cpu.hl); break;
-//		case 0x2A: LDAHLI(); break;
-//		case 0x2B: DECHL(); break;
-//		case 0x2C: INCr(&gb_cpu.l); break;
-//		case 0x2D: DECr(&gb_cpu.l); break;
-//		case 0x2E: LDrn(&gb_cpu.l); break;
-//		case 0x2F: CPL(); break;
-//		case 0x30:; break;
-//		case 0x31:; break;
-//		case 0x32:; break;
-//		case 0x33:; break;
-//		case 0x34:; break;
-//		case 0x35:; break;
-//		case 0x36:; break;
-//		case 0x37:; break;
-//		case 0x38:; break;
-//		case 0x39:; break;
-//		case 0x3A:; break;
-//		case 0x3B:; break;
-//		case 0x3C:; break;
-//		case 0x3D:; break;
-//		case 0x3E:; break;
-//		case 0x3F:; break;
-//		case 0x40:; break;
-//		case 0x41:; break;
-//		case 0x42:; break;
-//		case 0x43:; break;
-//		case 0x44:; break;
-//		case 0x45:; break;
-//		case 0x46:; break;
-//		case 0x47:; break;
-//		case 0x48:; break;
-//		case 0x49:; break;
-//		case 0x4A:; break;
-//		case 0x4B:; break;
-//		case 0x4C:; break;
-//		case 0x4D:; break;
-//		case 0x4E:; break;
-//		case 0x4F:; break;
-//		case 0x50:; break;
-//		case 0x51:; break;
-//		case 0x52:; break;
-//		case 0x53:; break;
-//		case 0x54:; break;
-//		case 0x55:; break;
-//		case 0x56:; break;
-//		case 0x57:; break;
-//		case 0x58:; break;
-//		case 0x59:; break;
-//		case 0x5A:; break;
-//		case 0x5B:; break;
-//		case 0x5C:; break;
-//		case 0x5D:; break;
-//		case 0x5E:; break;
-//		case 0x5F:; break;
-//		case 0x60:; break;
-//		case 0x61:; break;
-//		case 0x62:; break;
-//		case 0x63:; break;
-//		case 0x64:; break;
-//		case 0x65:; break;
-//		case 0x66:; break;
-//		case 0x67:; break;
-//		case 0x68:; break;
-//		case 0x69:; break;
-//		case 0x6A:; break;
-//		case 0x6B:; break;
-//		case 0x6C:; break;
-//		case 0x6D:; break;
-//		case 0x6E:; break;
-//		case 0x6F:; break;
-//		case 0x70:; break;
-//		case 0x71:; break;
-//		case 0x72:; break;
-//		case 0x73:; break;
-//		case 0x74:; break;
-//		case 0x75:; break;
-//		case 0x76:; break;
-//		case 0x77:; break;
-//		case 0x78:; break;
-//		case 0x79:; break;
-//		case 0x7A:; break;
-//		case 0x7B:; break;
-//		case 0x7C:; break;
-//		case 0x7D:; break;
-//		case 0x7E:; break;
-//		case 0x7F:; break;
-//		case 0x80:; break;
-//		case 0x81:; break;
-//		case 0x82:; break;
-//		case 0x83:; break;
-//		case 0x84:; break;
-//		case 0x85:; break;
-//		case 0x86:; break;
-//		case 0x87:; break;
-//		case 0x88:; break;
-//		case 0x89:; break;
-//		case 0x8A:; break;
-//		case 0x8B:; break;
-//		case 0x8C:; break;
-//		case 0x8D:; break;
-//		case 0x8E:; break;
-//		case 0x90:; break;
-//		case 0x91:; break;
-//		case 0x92:; break;
-//		case 0x93:; break;
-//		case 0x94:; break;
-//		case 0x95:; break;
-//		case 0x96:; break;
-//		case 0x97:; break;
-//		case 0x98:; break;
-//		case 0x99:; break;
-//		case 0x9A:; break;
-//		case 0x9B:; break;
-//		case 0x9C:; break;
-//		case 0x9D:; break;
-//		case 0x9E:; break;
-//		case 0x9F:; break;
-//		case 0xA0:; break;
-//		case 0xA1:; break;
-//		case 0xA2:; break;
-//		case 0xA3:; break;
-//		case 0xA4:; break;
-//		case 0xA5:; break;
-//		case 0xA6:; break;
-//		case 0xA7:; break;
-//		case 0xA8:; break;
-//		case 0xA9:; break;
-//		case 0xAA:; break;
-//		case 0xAB:; break;
-//		case 0xAC:; break;
-//		case 0xAD:; break;
-//		case 0xAE:; break;
-//		case 0xAF:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//		case 0x04:; break;
-//
-//
-//	}
-//
-//}
+}
+
+// Prefixed CB instructions
+void CB(void) {
+	printf("CB instruction \n");
+}
+
+const void(*instructions[0x100])() = {
+	// 0x00
+	NOP,	LDBCnn,		LDBCmA,		INCBC,
+	INCb, DECb, LDbn, RLCA,
+	LDnnmSP, ADDHLBC, LDABCm, DECBC,
+	INCc, DECc, LDcn, RRA,
+
+	// 0x10
+	STOP, LDDEnn, LDDEmA, INCDE,
+	INCd, DECd, LDdn, RLA,
+	JRe, ADDHLDE, LDADEm, DECDE,
+	INCe, DECe, LDen, RRA,
+
+	// 0x20
+	JRNZe, LDHLnn, LDHLImA, INCHL,
+	INCh, DECh, LDhn, DAA, 
+	JRZe, ADDHLHL, LDAHLIm, DECHL,
+	INCl, DECl, LDln, CPL,
+
+	// 0x30
+	JRNCe, LDSPnn, LDHLDmA, INCSP,
+	INCHLm, DECHLm, LDHLmn, SCF,
+	JRCe, ADDHLSP, LDAHLDm, DECSP,
+	INCa, DECa, LDan, CCF,
+
+	// 0x40
+	LDbb, LDbc, LDbd, LDbe,
+	LDbh, LDbl, LDbHLm, LDba,
+	LDcb, LDcc, LDcd, LDce,
+	LDch, LDcl, LDcHLm, LDca,
+
+	// 0x50
+	LDdb, LDdc, LDdd, LDde,
+	LDdh, LDdl, LDdHLm, LDda,
+	LDeb, LDec, LDed, LDee,
+	LDeh, LDel, LDeHLm, LDca,
+
+	// 0x60
+	LDhb, LDhc, LDhd, LDhe,
+	LDhh, LDhl, LDhHLm, LDha,
+	LDlb, LDlc, LDld, LDle,
+	LDlh, LDll, LDlHLm, LDla,
+
+	// 0x70
+	LDHLmb, LDHLmc, LDHLmd, LDHLme,
+	LDHLmh, LDHLml, HALT, LDHLma,
+	LDab, LDac, LDad, LDae,
+	LDah, LDal, LDaHLm, LDaa,
+
+	// 0x80
+	ADDAb, ADDAc, ADDAd, ADDAe,
+	ADDAh, ADDAl, ADDAHLm, ADDAa,
+	ADCAb, ADCAc, ADCAd, ADCAe,
+	ADCAh, ADCAl, ADCAHLm, ADCAa,
+
+	// 0x90
+	SUBb, SUBc, SUBd, SUBe,
+	SUBh, SUBl, SUBHLm, SUBa,
+	SBCAb, SBCAc, SBCAd, SBCAe,
+	SBCAh, SBCAl, SBCAHLm, SBCAa,
+
+	// 0xA0
+	ANDb, ANDc, ANDd, ANDe,
+	ANDh, ANDl, ANDHLm, ANDa,
+	XORb, XORc, XORd, XORe,
+	XORh, XORl, XORHLm, XORa,
+
+	// 0xB0
+	ORb, ORc, ORd, ORe,
+	ORh, ORl, ORHLm, ORa,
+	CPb, CPc,CPd, CPe,
+	CPh, CPl, CPHLm, CPa,
+
+	// 0xC0
+	RETNZ, POPBC, JPNZnn, JPnn,
+	CALLNZnn, PUSHBC, ADDAn, RST00,
+	RETZ, RET, JPZnn, CB,
+	CALLZnn, CALLnn, ADCAn, RST08,
+
+	// 0xD0
+	RETNC, POPDE, JPNCnn, CPU_NULL,
+	CALLNCnn, PUSHDE, SUBn, RST10,
+	RETC, RETI, JPCnn, CPU_NULL,
+	CALLCnn, CPU_NULL, SBCAn, RST18,
+
+	// 0xE0
+	LDnmA,       POPHL,       LDCmA,     CPU_NULL,
+	CPU_NULL,    PUSHHL,      ANDn,      RST20,
+	ADDSPe,      JPHLm,       LDnnmA,    CPU_NULL,
+	CPU_NULL,    CPU_NULL,    XORn,      RST28,
+
+	// 0xF0
+	LDAnm,       POPAF,       LDACm,     DI,
+	CPU_NULL,    PUSHAF,      ORn,	     RST30,
+	LDHLSPe,	 LDSPHL,	  LDAnnm,    EI,
+	CPU_NULL,    CPU_NULL,    CPn,		 RST38
+};
+
+const void(*CBinstructions[0x100])() = {
+	// 0x00
+	RLCb, RLCc, RLCd, RLCe,
+	RLCh, RLCl, RLCHLm, RLCa,
+	RRCb, RRCc, RRCd, RRCe,
+	RRCh, RRCl, RRCHLm, RRCa,
+
+	// 0x10
+	RLb, RLc, RLd, RLe,
+	RLh, RLl, RLHLm, RLa,
+	RRb, RRc, RRd, RRe,
+	RRh, RRl, RRHLm, RRa,
+
+	// 0x20
+	SWAPb, SWAPc, SWAPd, SWAPe,
+	SWAPh, SWAPl, SWAPHLm, SWAPa,
+	SRLb, SRLc, SRLd, SRLe,
+	SRLh, SRLl, SRLHLm, SRLa,
+
+	// 0x30
+	// NOTA: Stopped here!
+};

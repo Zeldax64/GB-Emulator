@@ -22,8 +22,8 @@
 #define CLEAR_FLAGS gb_cpu.f = 0
 
 /*----- CPU functions -----*/
-void CPU_init();
-void CPU_cycle();
+void CPU_init(void);
+void CPU_cycle(void);
 
 /*----- Flag calculator functions -----*/
 void flagC8(uint8_t val1, uint8_t val2);
@@ -205,21 +205,21 @@ void LDHLml(uint8_t reg);
 
 // End
 
-void LDHLn();
-void LDABC();
-void LDADE();
-void LDaCm();
-void LDCma();
-void LDanm();
-void LDnma();
-void LDannm();
-void LDnnma();
-void LDaHLIm();
-void LDaHLDm();
-void LDBCma();
-void LDDEma();
-void LDHLIma();
-void LDHLDma();
+void LDHLmn();
+void LDABCm();
+void LDADEm();
+void LDACm();
+void LDCmA();
+void LDAnm();
+void LDnmA();
+void LDAnnm();
+void LDnnmA();
+void LDAHLIm();
+void LDAHLDm();
+void LDBCmA();
+void LDDEmA();
+void LDHLImA();
+void LDHLDmA();
 
 // End
 
@@ -228,6 +228,7 @@ void LDHLDma();
 // LDddnn instructions expansion to all possibilities of dd.
 void LDddnn(uint16_t *reg);
 
+void LDBCnn(uint16_t *reg);
 void LDDEnn(uint16_t *reg);
 void LDHLnn(uint16_t *reg);
 void LDSPnn(uint16_t *reg);
@@ -617,7 +618,7 @@ void JRNZe();
 void JRZe();
 void JRNCe();
 void JRCe();
-void JPHL();
+void JPHLm();
 
 /*----- Call and Return Instructions -----*/
 void CALLnn();
@@ -631,7 +632,19 @@ void RETNZ();
 void RETZ();
 void RETNC();
 void RETC();
+
+// RST instructions expansion to all possibilities of values.
 void RST(uint8_t t);
+void RST00();
+void RST08();
+void RST10();
+void RST18();
+void RST20();
+void RST28();
+void RST30();
+void RST38();
+
+// End
 
 /*----- General-Purpose Arithmetic Operations and CPU Control Instructions -----*/
 void DAA();

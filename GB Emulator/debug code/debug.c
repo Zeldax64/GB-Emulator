@@ -3,7 +3,7 @@
 /*----- Functions -----*/
 
 /*
-	Compare two 1 byte arrays starting at address 0.
+	Compare two 1 byte arrays starting the given address.
 	@param ar1: pointer to the begin of a 1 byte array 
 	@param ar2: pointer to the begin of a 1 byte array
 	@param end: number of elements to be compared
