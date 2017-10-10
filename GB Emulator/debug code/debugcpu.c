@@ -12,7 +12,7 @@ const static struct InstructionSetDebug instruction_debug[0x100];
 
 const struct InstructionSetDebug instruction_debug[0x100] = {
 	// 0x00
-	{"NOP"},
+	{" NOP "},
 	{ "LDBCnn" },
 	{ "LDBCmA" },
 	{ "INCBC" },
@@ -346,3 +346,132 @@ const struct InstructionSetDebug instruction_debug[0x100] = {
 	{ "CPn" },
 	{ "RST38" }
 };
+
+void printReg(void) {
+	printf("--- GB CPU Registers ---\n");
+	printf("A: %2x    F: %2x\n", gb_cpu.a, gb_cpu.f);
+	printf("B: %2x    C: %2x\n", gb_cpu.b, gb_cpu.c);
+	printf("D: %2x    E: %2x\n", gb_cpu.d, gb_cpu.e);
+	printf("H: %2x    L: %2x\n", gb_cpu.h, gb_cpu.l);
+	printf("PC: %4x    SP: %4x\n", gb_cpu.pc, gb_cpu.sp);
+}
+
+void printDbgReg(void) {
+	printf("--- Cinoop CPU Registers ---\n");
+	printf("A: %2x    F: %2x\n", registers.a, registers.f);
+	printf("B: %2x    C: %2x\n", registers.b, registers.c);
+	printf("D: %2x    E: %2x\n", registers.d, registers.e);
+	printf("H: %2x    L: %2x\n", registers.h, registers.l);
+	printf("PC: %4x    SP: %4x\n", registers.pc, registers.sp);
+}
+
+void printMem(uint16_t pc) {
+	pc -= 2;
+	printf("--- Mem Map ---\n");
+	for (int i = 0; i < 5; i++, pc++) {
+		if(i == 2)
+			printf("-> [%x] = %x, %s <-\n", pc, rdWord(pc), instruction_debug[rdByte(pc)]);
+		else
+			printf("[%x] = %x, %s\n", pc, rdWord(pc), instruction_debug[rdByte(pc)]);
+	}
+}
+
+void genReport(void) {
+	//printMem(gb_cpu.pc);
+	printReg();
+	printDbgReg();
+	printf("-> [%x] = %x, %s <-\n", gb_cpu.pc, rdWord(gb_cpu.pc), instruction_debug[rdByte(gb_cpu.pc)]);
+}
+
+bool cmpReg() {
+	bool cmp = false;
+
+	if (gb_cpu.af != registers.af) {
+		printf("AF->GB: %4x    Cin: %4x\n", gb_cpu.af, registers.af);
+		cmp = true;
+	}
+	if (gb_cpu.bc != registers.bc) {
+		printf("BC->GB: %4x    Cin: %4x\n", gb_cpu.bc, registers.bc);
+		cmp = true;
+	}
+	if (gb_cpu.de != registers.de) {
+		printf("DE->GB: %4x    Cin: %4x\n", gb_cpu.de, registers.de);
+		cmp = true;
+	}
+	if (gb_cpu.hl != registers.hl) {
+		printf("HL->GB: %4x    Cin: %4x\n", gb_cpu.hl, registers.hl);
+		cmp = true;
+	}
+	if (gb_cpu.pc != registers.pc) {
+		printf("PC->GB: %4x    Cin: %4x\n", gb_cpu.pc, registers.pc);
+		cmp = true;
+	}
+
+	if (cmp)
+		return false;
+	return true;
+}
+
+bool cmpMem() {
+	bool cmp = false;
+
+	// Compare WRAM
+	for (int i = 0; i < 0x2000; i++) {
+		if (gb_mmu.wram[i] != dbgb_mmu.wram[i]) {
+			cmp = true;
+			printf("Erro wram[%d]: GB_MMU %x    CIN_MMU %x", i, gb_mmu.wram[i], dbgb_mmu.wram[i]);
+		}
+	}
+	for (int i = 0; i < 0x2000; i++) {
+		if (gb_mmu.eram[i] != dbgb_mmu.eram[i]) {
+			cmp = true;
+			printf("Erro eram[%d]: GB_MMU %x    CIN_MMU %x", i, gb_mmu.eram[i], dbgb_mmu.eram[i]);
+		}
+	}
+	for (int i = 0; i < 0x7F; i++) {
+		if (gb_mmu.zram[i] != dbgb_mmu.zram[i]) {
+			cmp = true;
+			printf("Erro zram[%d]: GB_MMU %x    CIN_MMU %x", i, gb_mmu.zram[i], dbgb_mmu.zram[i]);
+		}
+	}
+	for (int i = 0; i < 0x2000; i++) {
+		if (gb_mmu.vram[i] != dbgb_mmu.vram[i]) {
+			cmp = true;
+			printf("Erro vram[%d]: GB_MMU %x    CIN_MMU %x", i, gb_mmu.vram[i], dbgb_mmu.vram[i]);
+		}
+	}
+	for (int i = 0; i < 0xA0; i++) {
+		if (gb_mmu.oam[i] != dbgb_mmu.oam[i]) {
+			cmp = true;
+			printf("Erro wram[%d]: GB_MMU %x    CIN_MMU %x", i, gb_mmu.wram[i], dbgb_mmu.wram[i]);
+		}
+	}
+	if (cmp)
+		return false;
+	return true;
+}
+
+void gbCompare() {
+	if (!cmpReg()) {
+		printf("!!!Erro nos registros!!!\n");
+		genReport();
+		getchar();
+	}
+	if (!cmpMem()) {
+		printf("!!!Erro na memoria!!!\n");
+		genReport();
+		getchar();
+	}
+
+}
+
+void DBCPU_cycle(void) {
+	genReport();
+	CPU_cycle();
+	cpuStep(); // Debug CPU step
+	//getchar();
+	//system("cls");
+	gbCompare();
+	printf("#############################\n");
+
+}

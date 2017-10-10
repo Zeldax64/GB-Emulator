@@ -19,7 +19,6 @@ void CPU_init(void) {
 
 void CPU_cycle(void) {
 	uint8_t op = rdByte(gb_cpu.pc);
-	printf("OP: %x\n", op);
 	(*instructions[op])();
 }
 
@@ -196,7 +195,8 @@ void LDHLDmA() { wrByte(gb_cpu.hl, gb_cpu.a); gb_cpu.hl--; gb_cpu.pc++; gb_cpu.m
 
 /* 16-Bit */
 // LDddnn instructions expansion to all possibilities of dd.
-void LDddnn(uint16_t *reg) { *(reg) = rdWord(gb_cpu.pc++); gb_cpu.pc += 2; gb_cpu.m += 3;}	  // LD dd, nn
+
+void LDddnn(uint16_t *reg) { *(reg) = rdWord(++gb_cpu.pc); gb_cpu.pc += 2; gb_cpu.m += 3;}	  // LD dd, nn
 
 void LDBCnn(uint16_t *reg) { LDddnn(&gb_cpu.bc); }
 void LDDEnn(uint16_t *reg) { LDddnn(&gb_cpu.de); }
@@ -1191,14 +1191,14 @@ void JPNZnn() {
 		gb_cpu.m += 3;
 	}
 	else {
-		gb_cpu.pc = rdWord(gb_cpu.pc + 1);
+		gb_cpu.pc = rdWord(++gb_cpu.pc);
 		gb_cpu.m += 4;
 	}
 }
 
 void JPZnn() {
 	if (gb_cpu.f & FLAGZ) {
-		gb_cpu.pc = rdWord(gb_cpu.pc + 1);
+		gb_cpu.pc = rdWord(++gb_cpu.pc);
 		gb_cpu.m += 4;
 	}
 	else {
@@ -1213,14 +1213,14 @@ void JPNCnn() {
 		gb_cpu.m += 3;
 	}
 	else {
-		gb_cpu.pc = rdWord(gb_cpu.pc + 1);
+		gb_cpu.pc = rdWord(++gb_cpu.pc);
 		gb_cpu.m += 4;
 	}
 }
 
 void JPCnn() {
 	if (gb_cpu.f & FLAGC) {
-		gb_cpu.pc = rdWord(gb_cpu.pc + 1);
+		gb_cpu.pc = rdWord(++gb_cpu.pc);
 		gb_cpu.m += 4;
 	}
 	else {
@@ -1241,6 +1241,7 @@ void JRe() {
 
 	gb_cpu.pc += e;
 
+	gb_cpu.pc++;
 	gb_cpu.m += 3;
 }
 
@@ -1282,14 +1283,18 @@ void JRNZe() {
 		gb_cpu.m += 2;
 	}
 	else {
-		gb_cpu.pc += (int8_t) rdByte(gb_cpu.pc + 1);
+		gb_cpu.pc += (int8_t) rdByte(++gb_cpu.pc);
+		
+		gb_cpu.pc++;
 		gb_cpu.m += 3;
 	}
 }
 
 void JRZe() {
 	if (gb_cpu.f & FLAGZ) {
-		gb_cpu.pc += (int8_t)rdByte(gb_cpu.pc + 1);
+		gb_cpu.pc += (int8_t)rdByte(++gb_cpu.pc);
+		
+		gb_cpu.pc++;
 		gb_cpu.m += 3;
 	}
 	else {
@@ -1304,7 +1309,9 @@ void JRNCe() {
 		gb_cpu.m += 2;
 	}
 	else {
-		gb_cpu.pc += (int8_t)rdWord(gb_cpu.pc + 1);
+		gb_cpu.pc += (int8_t)rdWord(++gb_cpu.pc);
+
+		gb_cpu.pc++;
 		gb_cpu.m += 3;
 	}
 }
@@ -1312,7 +1319,9 @@ void JRNCe() {
 
 void JRCe() {
 	if (gb_cpu.f & FLAGC) {
-		gb_cpu.pc += (int8_t)rdWord(gb_cpu.pc + 1);
+		gb_cpu.pc += (int8_t)rdWord(++gb_cpu.pc);
+
+		gb_cpu.pc++;
 		gb_cpu.m += 3;
 	}
 	else {
@@ -1577,6 +1586,7 @@ void CPU_NULL(void) {
 // Prefixed CB instructions
 void CB(void) {
 	printf("CB instruction \n");
+	getchar();
 }
 
 const void(*instructions[0x100])() = {

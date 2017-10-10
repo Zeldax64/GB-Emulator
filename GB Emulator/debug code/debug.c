@@ -22,3 +22,39 @@ bool cmpArray8(uint8_t *ar1, uint8_t *ar2, uint32_t end) {
 	printf("Identical arrays!\n");
 	return true;
 }
+
+void matchMMU() {
+	for (uint16_t i = 0; i < MEM8K; i++) {
+		dbgb_mmu.rom[i] = gb_mmu.rom[i];
+	}
+
+	for (uint16_t i = 0; i < 0x2000; i++) {
+		dbgb_mmu.wram[i] = gb_mmu.wram[i];
+	}
+
+	for (uint16_t i = 0; i < 0x2000; i++) {
+		dbgb_mmu.eram[i] = gb_mmu.eram[i];
+	}
+
+	for (uint8_t i = 0; i < 0x7F; i++) {
+		dbgb_mmu.zram[i] = gb_mmu.zram[i];
+	}
+
+	for (uint16_t i = 0; i < 0x2000; i++) {
+		dbgb_mmu.vram[i] = gb_mmu.vram[i];
+	}
+
+	for (uint8_t i = 0; i < 0xA0; i++) {
+		dbgb_mmu.oam[i] = gb_mmu.oam[i];
+	}
+}
+
+void debugCycle() {
+	matchMMU();
+	dbreset();
+
+	while (true) {
+		DBCPU_cycle();
+	}
+
+}

@@ -1,6 +1,4 @@
-#ifndef _BIT
-#define _BIT
-
+#pragma once
 /*
 	General bit operations.
 */
@@ -21,6 +19,3 @@
 uint8_t testBit(uint8_t var, uint8_t bit);
 uint8_t setBit(uint8_t var, uint8_t bit);
 uint8_t resetBit(uint8_t var, uint8_t bit);
-
-
-#endif

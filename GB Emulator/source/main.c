@@ -88,7 +88,6 @@ char* filename = "C:\\Users\\caiox\\Documents\\Emulators\\GB\\ROMs\\Tetris\\Tetr
 void main() {
 	loadROM(filename);
 	emulatorInit();
-	emulateCycle();
-
+	debugCycle();
 }
 
