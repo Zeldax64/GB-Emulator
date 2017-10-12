@@ -20,32 +20,30 @@
 
 /*----- Function Prototypes -----*/
 void MMU_init();
-void load(char * file);
+bool loadROM(char * filename);
 void reset();
 uint8_t rdByte(uint16_t addr);
 uint16_t rdWord(uint16_t addr);
 void wrByte(uint16_t addr, uint8_t val);
 void wrWord(uint16_t addr, uint16_t val);
-uint8_t * MMU_getAddr(uint16_t addr);
-
+void switchROM();
+bool testBit(uint16_t addr, uint8_t bit);
+uint8_t * getAtAddr(uint16_t addr, uint16_t size);
+uint8_t* MMU_getAddr(uint16_t addr);
 
 /*----- Structs -----*/
 typedef struct{
+
 	uint8_t rombank; // Selected ROM bank
 	uint8_t rambank; // Selected RAM bank
 	bool enableERam; //Is External RAM enable?
 	bool mode; // 16/8 or 4/32
-}MBC1;
-
-typedef struct{
-
-	MBC1 mbc1;
 
 	bool inbios; 
 	bool ie; // Interrupt Enable Register - 0xFFFF
 
 	uint8_t carttype;
-	uint8_t ROMbank;
+	//uint8_t ROMbank;
 
 	uint8_t bios[0x100];   // BIOS
 	uint8_t rom[0x8000];   // ROM
@@ -61,8 +59,9 @@ typedef struct{
 
 }GB_MMU;
 
-GB_MMU gb_mmu;
+GB_MMU GB_mmu;
 
+char * gameName;
 
 
 #endif
