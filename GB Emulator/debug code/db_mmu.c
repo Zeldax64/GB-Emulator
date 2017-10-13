@@ -25,6 +25,7 @@ void DBMMU_init() {
 		gb_mmu.oam[i] = 0;
 	}
 
+
 }
 
 uint8_t readByte(uint16_t addr) {
@@ -112,12 +113,12 @@ uint8_t readByte(uint16_t addr) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: return GB_tim.divr;	  // 0xFF04
-					case TIM_TIMA: return GB_tim.tima;	  // 0xFF05
-					case TIM_TMA:  return GB_tim.tma;	  // 0xFF06
-					case TIM_TMC:  return GB_tim.tmc;	  // 0xFF07
-					case INT_REQ:  return GB_int.int_req; // 0xFF0F
-					case INT_ENA:  return GB_int.int_ena; // 0xFFFF
+					case TIM_DIVR: return gb_tim.divr;	  // 0xFF04
+					case TIM_TIMA: return gb_tim.tima;	  // 0xFF05
+					case TIM_TMA:  return gb_tim.tma;	  // 0xFF06
+					case TIM_TMC:  return gb_tim.tmc;	  // 0xFF07
+					case INT_REQ:  return gb_int.int_req; // 0xFF0F
+					case INT_ENA:  return gb_int.int_ena; // 0xFFFF
 				}
 				return 0;
 			}
@@ -243,13 +244,13 @@ void writeByte(uint16_t addr, uint8_t val) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: GB_tim.divr = 0;   break; // 0xFF04
-					case TIM_TIMA: GB_tim.tima = val; break; // 0xFF05
-					case TIM_TMA:  GB_tim.tma = val;  break; // 0xFF06
-					case TIM_TMC:  GB_tim.tmc = val;  break; // 0xFF07
-					case INT_REQ:  GB_int.int_req = val; break;  // 0xFF0F
+					case TIM_DIVR: gb_tim.divr = 0;   break; // 0xFF04
+					case TIM_TIMA: gb_tim.tima = val; break; // 0xFF05
+					case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
+					case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
+					case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
 					case DMA_ADDR: DMA_doDMA(val); break;		 // 0xFF46	
-					case INT_ENA:  GB_int.int_ena = val;  break; // 0xFFFF
+					case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				}
 			}
 		}
@@ -321,12 +322,12 @@ uint8_t * DBMMU_getAddr(uint16_t addr) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-				case TIM_DIVR: return &GB_tim.divr;	  // 0xFF04
-				case TIM_TIMA: return &GB_tim.tima;	  // 0xFF05
-				case TIM_TMA:  return &GB_tim.tma;	  // 0xFF06
-				case TIM_TMC:  return &GB_tim.tmc;	  // 0xFF07
-				case INT_REQ:  return &GB_int.int_req; // 0xFF0F
-				case INT_ENA:  return &GB_int.int_ena; // 0xFFFF
+				case TIM_DIVR: return &gb_tim.divr;	  // 0xFF04
+				case TIM_TIMA: return &gb_tim.tima;	  // 0xFF05
+				case TIM_TMA:  return &gb_tim.tma;	  // 0xFF06
+				case TIM_TMC:  return &gb_tim.tmc;	  // 0xFF07
+				case INT_REQ:  return &gb_int.int_req; // 0xFF0F
+				case INT_ENA:  return &gb_int.int_ena; // 0xFFFF
 				}
 			}
 		}

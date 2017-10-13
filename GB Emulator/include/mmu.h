@@ -4,8 +4,7 @@
 /*----------- MEMORY ------------*/
 ///////////////////////////////////
 
-#ifndef _MMU
-#define _MMU
+#pragma once
 
 #include <stdio.h>
 #include <stdint.h>
@@ -15,6 +14,7 @@
 #include "timer.h"
 #include "dma.h"
 #include "interrupt.h"
+#include "lcd.h"
 
 #define MEM8K 0x1FFF  // Represents 8kB of memory
 
@@ -62,7 +62,3 @@ typedef struct{
 }GB_MMU;
 
 GB_MMU gb_mmu;
-
-
-
-#endif

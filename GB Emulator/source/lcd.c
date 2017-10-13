@@ -94,7 +94,9 @@ void LCD_setStatus() {
 }
 
 void LCD_drawScanLine() {
-
+	if (testBit(gb_lcd.lcdc, BIT0))
+		LCD_renderTiles();
+	
 }
 
 void LCD_renderScreen() {

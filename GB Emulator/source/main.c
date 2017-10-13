@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/* SDL Includes */
+#include <SDL.h>
+
+
 /* Emulator Includes */
 #include "cpu.h"
 #include "mmu.h"
@@ -76,18 +80,41 @@ void printOAM() {
 
 void emulatorInit(void) {
 	CPU_init();
+	MMU_init();
 }
 
 void emulateCycle(void) {
-	while (1)
+	const int MAXCYCLES = 17477; // Machine Cycles
+	int cycles_this_update = 0;
+	while (cycles_this_update < MAXCYCLES) {
 		CPU_cycle();
+		cycles_this_update += gb_cpu.m;
+		TIM_updateTimers(gb_cpu.m);
+		LCD_update(gb_cpu.m);
+		INT_doInt();
+	}
+	LCD_renderScreen();
 }
 
 char* filename = "C:\\Users\\caiox\\Documents\\Emulators\\GB\\ROMs\\Tetris\\Tetris.gb";
 
 void main() {
+	const int SCREEN_WIDTH = 640;
+	const int SCREEN_HEIGHT = 480;
+
+	SDL_Window* window = NULL;
+
+	SDL_Surface* screenSurface = NULL;
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+	/*
 	loadROM(filename);
 	emulatorInit();
 	debugCycle();
+	/*
+	while (true)
+		emulateCycle();
+	*/
 }
 

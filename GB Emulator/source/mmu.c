@@ -25,6 +25,37 @@ void MMU_init() {
 		gb_mmu.oam[i] = 0;
 	}
 
+	wrByte(TIM_TIMA, 0);
+	wrByte(TIM_TMA, 0);
+	wrByte(TIM_TMC, 0);
+	wrByte(0xFF10, 0x80);
+	wrByte(0xFF11, 0xBF);
+	wrByte(0xFF12, 0xF3);
+	wrByte(0xFF14, 0xBF);
+	wrByte(0xFF16, 0x3F);
+	wrByte(0xFF17, 0x00);
+	wrByte(0xFF19, 0xBF);
+	wrByte(0xFF1A, 0x7F); // Modified
+	wrByte(0xFF1B, 0xFF);
+	wrByte(0xFF1C, 0x9F);
+	wrByte(0xFF1E, 0xBF);
+	wrByte(0xFF20, 0xFF);
+	wrByte(0xFF21, 0x00);
+	wrByte(0xFF22, 0x00);
+	wrByte(0xFF23, 0xBF);
+	wrByte(0xFF24, 0x77);
+	wrByte(0xFF25, 0xF3);
+	wrByte(0xFF26, 0xF1);
+	wrByte(LCD_LCDC, 0x91);
+	wrByte(LCD_SCY, 0x00);
+	wrByte(LCD_SCX, 0x00);
+	wrByte(LCD_LYC, 0x00);
+	wrByte(LCD_BGP, 0xFC);
+	wrByte(0xFF48, 0xFF);
+	wrByte(0xFF49, 0xFF);
+	wrByte(LCD_WY, 0x00);
+	wrByte(LCD_WX, 0x00);
+	wrByte(INT_ENA, 0x00);
 }
 
 
@@ -157,12 +188,21 @@ uint8_t rdByte(uint16_t addr) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: return GB_tim.divr;	  // 0xFF04
-					case TIM_TIMA: return GB_tim.tima;	  // 0xFF05
-					case TIM_TMA:  return GB_tim.tma;	  // 0xFF06
-					case TIM_TMC:  return GB_tim.tmc;	  // 0xFF07
-					case INT_REQ:  return GB_int.int_req; // 0xFF0F
-					case INT_ENA:  return GB_int.int_ena; // 0xFFFF
+					case TIM_DIVR: return gb_tim.divr;	  // 0xFF04
+					case TIM_TIMA: return gb_tim.tima;	  // 0xFF05
+					case TIM_TMA:  return gb_tim.tma;	  // 0xFF06
+					case TIM_TMC:  return gb_tim.tmc;	  // 0xFF07
+					case INT_REQ:  return gb_int.int_req; // 0xFF0F
+					case LCD_LCDC: return gb_lcd.lcdc;	  // 0xFF40
+					case LCD_STAT: return gb_lcd.stat;	  // 0xFF41
+					case LCD_SCY:  return gb_lcd.scy;	  // 0xFF42
+					case LCD_SCX:  return gb_lcd.scx;	  // 0xFF43
+					case LCD_LY:   return gb_lcd.ly;	  // 0xFF44
+					case LCD_LYC:  return gb_lcd.lyc;	  // 0xFF45
+					case LCD_BGP:  return gb_lcd.bgp;	  // 0xFF47
+					case LCD_WY:   return gb_lcd.wy;	  // 0xFF4A
+					case LCD_WX:   return gb_lcd.wx;	  // 0xFF4B
+					case INT_ENA:  return gb_int.int_ena; // 0xFFFF
 				}
 				return 0;
 			}
@@ -288,13 +328,22 @@ void wrByte(uint16_t addr, uint8_t val) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-					case TIM_DIVR: GB_tim.divr = 0;   break; // 0xFF04
-					case TIM_TIMA: GB_tim.tima = val; break; // 0xFF05
-					case TIM_TMA:  GB_tim.tma = val;  break; // 0xFF06
-					case TIM_TMC:  GB_tim.tmc = val;  break; // 0xFF07
-					case INT_REQ:  GB_int.int_req = val; break;  // 0xFF0F
+					case TIM_DIVR: gb_tim.divr = 0;   break; // 0xFF04
+					case TIM_TIMA: gb_tim.tima = val; break; // 0xFF05
+					case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
+					case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
+					case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
+					case LCD_LCDC: gb_lcd.lcdc = val;	  // 0xFF40
+					case LCD_STAT: gb_lcd.stat = val;	  // 0xFF41
+					case LCD_SCY:  gb_lcd.scy = val;	  // 0xFF42
+					case LCD_SCX:  gb_lcd.scx = val;	  // 0xFF43
+					case LCD_LY:   gb_lcd.ly = val;	  // 0xFF44
+					case LCD_LYC:  gb_lcd.lyc = val;	  // 0xFF45
 					case DMA_ADDR: DMA_doDMA(val); break;		 // 0xFF46	
-					case INT_ENA:  GB_int.int_ena = val;  break; // 0xFFFF
+					case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
+					case LCD_WY:   gb_lcd.wy = val;	  // 0xFF4A
+					case LCD_WX:   gb_lcd.wx = val;	  // 0xFF4B
+					case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				}
 			}
 		}
@@ -366,12 +415,21 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFF) {
-				case TIM_DIVR: return &GB_tim.divr;	  // 0xFF04
-				case TIM_TIMA: return &GB_tim.tima;	  // 0xFF05
-				case TIM_TMA:  return &GB_tim.tma;	  // 0xFF06
-				case TIM_TMC:  return &GB_tim.tmc;	  // 0xFF07
-				case INT_REQ:  return &GB_int.int_req; // 0xFF0F
-				case INT_ENA:  return &GB_int.int_ena; // 0xFFFF
+				case TIM_DIVR: return &gb_tim.divr;	   // 0xFF04
+				case TIM_TIMA: return &gb_tim.tima;	   // 0xFF05
+				case TIM_TMA:  return &gb_tim.tma;	   // 0xFF06
+				case TIM_TMC:  return &gb_tim.tmc;	   // 0xFF07
+				case INT_REQ:  return &gb_int.int_req; // 0xFF0F
+				case LCD_LCDC: return &gb_lcd.lcdc;	   // 0xFF40
+				case LCD_STAT: return &gb_lcd.stat;	   // 0xFF41
+				case LCD_SCY:  return &gb_lcd.scy;	   // 0xFF42
+				case LCD_SCX:  return &gb_lcd.scx;	   // 0xFF43
+				case LCD_LY:   return &gb_lcd.ly;	   // 0xFF44
+				case LCD_LYC:  return &gb_lcd.lyc;	   // 0xFF45
+				case LCD_BGP:  return &gb_lcd.bgp;	   // 0xFF47
+				case LCD_WY:   return &gb_lcd.wy;	   // 0xFF4A
+				case LCD_WX:   return &gb_lcd.wx;	   // 0xFF4B
+				case INT_ENA:  return &gb_int.int_ena; // 0xFFFF
 				}
 			}
 		}

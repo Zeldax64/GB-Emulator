@@ -30,7 +30,7 @@ typedef struct gbtimer {
 }GB_TIM;
 
 /*---- Variables -----*/
-GB_TIM GB_tim;
+GB_TIM gb_tim;
 
 
 #endif

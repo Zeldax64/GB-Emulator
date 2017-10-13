@@ -3,8 +3,7 @@
 	All names given are based on GBCPUman
 */
 
-#ifndef _LCD
-#define _LCD
+#pragma once
 
 /* General Includes */
 #include <stdint.h>
@@ -76,5 +75,3 @@ typedef struct gblcd {
 }GB_LCD;
 
 GB_LCD gb_lcd;
-
-#endif

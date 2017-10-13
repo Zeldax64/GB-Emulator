@@ -354,3 +354,7 @@ __pycache__/
 *.tlog
 *.vcxproj
 *.filters
+
+GB Emulator/SDL2-2\.0\.6/
+
+GB Emulator/SDL2-2\.0\.6-win32-x64/

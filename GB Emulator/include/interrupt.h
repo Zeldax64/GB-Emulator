@@ -39,6 +39,6 @@ typedef struct gbinterrupt {
 	uint8_t int_ena; // 0xFFFF - Interrupt Enable
 }GB_INT;
 
-GB_INT GB_int;
+GB_INT gb_int;
 
 #endif
