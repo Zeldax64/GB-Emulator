@@ -182,16 +182,16 @@ void LDABCm() { gb_cpu.a = rdByte(gb_cpu.bc); gb_cpu.pc++; gb_cpu.m += 2; }					
 void LDADEm() { gb_cpu.a = rdByte(gb_cpu.de); gb_cpu.pc++;	gb_cpu.m += 2; }				   // LD A, (DE)
 void LDACm() { gb_cpu.a = rdByte(gb_cpu.c + 0xFF00); gb_cpu.pc++; gb_cpu.m += 2; }			   // LD A, (C)
 void LDCmA() { wrByte(gb_cpu.c + 0xFF00, gb_cpu.a); gb_cpu.pc++; gb_cpu.m += 2; }			   // LD (C), A
-void LDAnm() { gb_cpu.a = rdByte(++gb_cpu.pc); gb_cpu.pc++; gb_cpu.m += 3; }					   // LD A, (n)
-void LDnmA() { wrByte(++gb_cpu.pc, gb_cpu.a); gb_cpu.pc++; gb_cpu.m += 3; }					   // LD (n), A
-void LDAnnm() { gb_cpu.a = rdByte(rdWord(++gb_cpu.pc)); gb_cpu.pc += 2; gb_cpu.m += 4; }		   // LD A, (nn)
+void LDAnm() { gb_cpu.a = rdByte(rdByte(++gb_cpu.pc) + 0xFF00); gb_cpu.pc++; gb_cpu.m += 3; }				   // LD A, (n)
+void LDnmA() { wrByte(rdByte(++gb_cpu.pc) + 0xFF00, gb_cpu.a); gb_cpu.pc++; gb_cpu.m += 3; }					   // LD (n), A
+void LDAnnm() { gb_cpu.a = rdByte(rdWord(++gb_cpu.pc)); gb_cpu.pc += 2; gb_cpu.m += 4; }	   // LD A, (nn)
 void LDnnmA() { wrByte(rdWord(++gb_cpu.pc), gb_cpu.a); gb_cpu.pc += 2; gb_cpu.m += 4; }		   // LD (nn), A
-void LDAHLIm() { gb_cpu.a = rdByte(gb_cpu.hl); gb_cpu.hl++; gb_cpu.pc++; gb_cpu.m += 2; }		   // LD A, (HLI)
-void LDAHLDm() { gb_cpu.a = rdByte(gb_cpu.hl); gb_cpu.hl--; gb_cpu.pc++; gb_cpu.m += 2; }		   // LD A, (HLD)
+void LDAHLIm() { gb_cpu.a = rdByte(gb_cpu.hl); gb_cpu.hl++; gb_cpu.pc++; gb_cpu.m += 2; }	   // LD A, (HLI)
+void LDAHLDm() { gb_cpu.a = rdByte(gb_cpu.hl); gb_cpu.hl--; gb_cpu.pc++; gb_cpu.m += 2; }	   // LD A, (HLD)
 void LDBCmA() { wrByte(gb_cpu.bc, gb_cpu.a); gb_cpu.pc++; gb_cpu.m += 2; }					   // LD (BC), A
 void LDDEmA() { wrByte(gb_cpu.de, gb_cpu.a); gb_cpu.pc++; gb_cpu.m += 2; }					   // LD (DE), A
-void LDHLImA() { wrByte(gb_cpu.hl, gb_cpu.a); gb_cpu.hl++; gb_cpu.pc++; gb_cpu.m += 2; }		   // LD (HLI), A
-void LDHLDmA() { wrByte(gb_cpu.hl, gb_cpu.a); gb_cpu.hl--; gb_cpu.pc++; gb_cpu.m += 2; }		   // LD (HLD), A
+void LDHLImA() { wrByte(gb_cpu.hl, gb_cpu.a); gb_cpu.hl++; gb_cpu.pc++; gb_cpu.m += 2; }	   // LD (HLI), A
+void LDHLDmA() { wrByte(gb_cpu.hl, gb_cpu.a); gb_cpu.hl--; gb_cpu.pc++; gb_cpu.m += 2; }	   // LD (HLD), A
 
 /* 16-Bit */
 // LDddnn instructions expansion to all possibilities of dd.
@@ -606,7 +606,7 @@ void CPr(uint8_t reg) {
 	CLEAR_FLAGS;
 	flagC8Sub(gb_cpu.a, reg);
 	flagH8Sub(gb_cpu.a, reg);
-	flagZ8(gb_cpu.a);
+	flagZ8(gb_cpu.a - reg);
 	gb_cpu.f |= FLAGN;
 
 	gb_cpu.m++;
@@ -629,7 +629,7 @@ void CPn() {
 	CLEAR_FLAGS;
 	flagC8Sub(gb_cpu.a, n);
 	flagH8Sub(gb_cpu.a, n);
-	flagZ8(gb_cpu.a);
+	flagZ8(gb_cpu.a - n);
 	gb_cpu.f |= FLAGN;
 
 	gb_cpu.m += 2;
@@ -642,7 +642,7 @@ void CPHLm() {
 	CLEAR_FLAGS;
 	flagC8Sub(gb_cpu.a, n);
 	flagH8Sub(gb_cpu.a, n);
-	flagZ8(gb_cpu.a);
+	flagZ8(gb_cpu.a - n);
 	gb_cpu.f |= FLAGN;
 
 	gb_cpu.m += 2;

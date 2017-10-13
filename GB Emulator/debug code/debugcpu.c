@@ -455,6 +455,17 @@ void gbCompare() {
 	if (!cmpReg()) {
 		printf("!!!Erro nos registros!!!\n");
 		genReport();
+
+		gb_cpu.pc -= 2;
+		registers.pc -= 2;
+		printf("GB [%4x] %4x   DB [%4x] %4x\n", gb_cpu.pc, rdByte(gb_cpu.pc), registers.pc, readByte(registers.pc));
+		
+		gb_cpu.pc++;
+		registers.pc++;
+		printf("GB [%4x] %4x   DB [%4x] %4x\n", gb_cpu.pc, rdByte(gb_cpu.pc), registers.pc, readByte(registers.pc));
+
+		printf("GB [%4x] %4x   DB [%4x] %4x\n", rdByte(gb_cpu.pc) + 0xFF00, rdByte(gb_cpu.pc + 0xFF00), readByte(registers.pc) + 0xFF00 , readByte(registers.pc + 0xFF00));
+
 		getchar();
 	}
 	if (!cmpMem()) {
@@ -466,12 +477,12 @@ void gbCompare() {
 }
 
 void DBCPU_cycle(void) {
-	genReport();
+	//genReport();
 	CPU_cycle();
 	cpuStep(); // Debug CPU step
 	//getchar();
 	//system("cls");
 	gbCompare();
-	printf("#############################\n");
+	//printf("#############################\n");
 
 }
