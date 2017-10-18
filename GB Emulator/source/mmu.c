@@ -187,7 +187,7 @@ uint8_t rdByte(uint16_t addr) {
 			}
 			else {
 				// I/O control handling
-				switch (addr & 0xFF) {
+				switch (addr & 0xFFFF) {
 					case TIM_DIVR: return gb_tim.divr;	  // 0xFF04
 					case TIM_TIMA: return gb_tim.tima;	  // 0xFF05
 					case TIM_TMA:  return gb_tim.tma;	  // 0xFF06
@@ -327,7 +327,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 			}
 			else {
 				// I/O control handling
-				switch (addr & 0xFF) {
+				switch (addr & 0xFFFF) {
 					case TIM_DIVR: gb_tim.divr = 0;   break; // 0xFF04
 					case TIM_TIMA: gb_tim.tima = val; break; // 0xFF05
 					case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
@@ -414,7 +414,7 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 			}
 			else {
 				// I/O control handling
-				switch (addr & 0xFF) {
+				switch (addr & 0xFFFF) {
 				case TIM_DIVR: return &gb_tim.divr;	   // 0xFF04
 				case TIM_TIMA: return &gb_tim.tima;	   // 0xFF05
 				case TIM_TMA:  return &gb_tim.tma;	   // 0xFF06
