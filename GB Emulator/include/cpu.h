@@ -14,10 +14,10 @@
 #define FLAGH BIT5  // Half-carry flag
 #define FLAGC BIT4  // Carry flag
 
-#define CLEAR_Z gb_cpu.f &= !FLAGZ // Clear flag Z
-#define CLEAR_N gb_cpu.f &= !FLAGN // Clear flag N
-#define CLEAR_H gb_cpu.f &= !FLAGH // Clear flag H
-#define CLEAR_C gb_cpu.f &= !FLAGC // Clear flag C
+#define CLEAR_Z gb_cpu.f &= ~FLAGZ // Clear flag Z
+#define CLEAR_N gb_cpu.f &= ~FLAGN // Clear flag N
+#define CLEAR_H gb_cpu.f &= ~FLAGH // Clear flag H
+#define CLEAR_C gb_cpu.f &= ~FLAGC // Clear flag C
 
 #define CLEAR_FLAGS gb_cpu.f = 0
 

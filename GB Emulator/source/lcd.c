@@ -104,6 +104,8 @@ void LCD_renderScreen() {
 		LCD_renderTiles();
 	if (testBit(gb_lcd.lcdc, BIT1))
 		LCD_renderSprites();
+	//GFX_render();
+	//GFX_display();
 }
 
 void LCD_renderTiles() {

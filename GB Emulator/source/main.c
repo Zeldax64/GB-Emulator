@@ -15,10 +15,11 @@
 /* Emulator Includes */
 #include "cpu.h"
 #include "mmu.h"
+#include "graphics.h"
 
 /* Debug Includes */
 #include "debug.h"
-
+#include "debugcpu.h"
 /* Defines */
 
 
@@ -83,38 +84,37 @@ void emulatorInit(void) {
 	MMU_init();
 }
 
+int cycles_this_update = 0;
+
 void emulateCycle(void) {
 	const int MAXCYCLES = 17477; // Machine Cycles
-	int cycles_this_update = 0;
 	while (cycles_this_update < MAXCYCLES) {
-		CPU_cycle();
+		printf("--- Cycle: %d ---\n", cycles_this_update);
+		getchar();  // Wait for input (enter)
+		genReport(false, true); // Generate report
+		CPU_cycle(); // Runs one cycle
 		cycles_this_update += gb_cpu.m;
+		gb_cpu.m = 0;
 		TIM_updateTimers(gb_cpu.m);
 		LCD_update(gb_cpu.m);
 		INT_doInt();
+		printf("-----------------\n");
 	}
 	LCD_renderScreen();
+	cycles_this_update -= MAXCYCLES;
 }
 
 char* filename = "C:\\Users\\caiox\\Documents\\Emulators\\GB\\ROMs\\Tetris\\Tetris.gb";
 
-void main() {
-	const int SCREEN_WIDTH = 640;
-	const int SCREEN_HEIGHT = 480;
-
-	SDL_Window* window = NULL;
-
-	SDL_Surface* screenSurface = NULL;
-
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-	/*
-	loadROM(filename);
+int main(int argc, char *argv[]) {
+	//GFX_init();
 	emulatorInit();
-	debugCycle();
-	/*
+	loadROM(filename);
+	//debugCycle();
+	
 	while (true)
 		emulateCycle();
-	*/
+
+	return 0;
 }
 

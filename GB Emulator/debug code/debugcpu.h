@@ -15,7 +15,7 @@
 void printReg(void);
 void printDbgReg(void);
 void printMem(uint16_t pc);
-void genReport(void);
+void genReport(bool both_cpu, bool complete);
 bool cmpReg();
 bool cmpMem();
 void gbCompare();

@@ -13,6 +13,7 @@
 #include "bit.h"
 #include "interrupt.h"
 #include "mmu.h"
+#include "graphics.h"
 
 /*----- Defines -----*/
 #define LCD_WIDTH  160

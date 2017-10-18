@@ -8,7 +8,7 @@ struct InstructionSetDebug {
 	char* inst;
 };
 
-const static struct InstructionSetDebug instruction_debug[0x100];
+const struct InstructionSetDebug instruction_debug[0x100];
 
 const struct InstructionSetDebug instruction_debug[0x100] = {
 	// 0x00
@@ -347,13 +347,14 @@ const struct InstructionSetDebug instruction_debug[0x100] = {
 	{ "RST38" }
 };
 
-void printReg(void) {
+void printCPUReg(void) {
 	printf("--- GB CPU Registers ---\n");
 	printf("A: %2x    F: %2x\n", gb_cpu.a, gb_cpu.f);
 	printf("B: %2x    C: %2x\n", gb_cpu.b, gb_cpu.c);
 	printf("D: %2x    E: %2x\n", gb_cpu.d, gb_cpu.e);
 	printf("H: %2x    L: %2x\n", gb_cpu.h, gb_cpu.l);
 	printf("PC: %4x    SP: %4x\n", gb_cpu.pc, gb_cpu.sp);
+	printf("IME: %d    INT ENA: %x\n", gb_cpu.ime, rdByte(0xFFFF));
 }
 
 void printDbgReg(void) {
@@ -376,11 +377,23 @@ void printMem(uint16_t pc) {
 	}
 }
 
-void genReport(void) {
+void printLCDReg() {
+	printf("--- LCD Registers ---\n");
+	printf("LCDC: %2x    STAT: %2x\n", gb_lcd.lcdc, gb_lcd.stat);
+	printf("WX: %2x    WY: %2x\n", gb_lcd.wx, gb_lcd.wy);
+	printf("ly: %2x    lyc: %2x\n", gb_lcd.ly, gb_lcd.lyc);
+	printf("\n");
+}
+
+void genReport(bool both_cpu, bool complete) {
 	//printMem(gb_cpu.pc);
-	printReg();
-	printDbgReg();
+	printCPUReg();
 	printf("-> [%x] = %x, %s <-\n", gb_cpu.pc, rdWord(gb_cpu.pc), instruction_debug[rdByte(gb_cpu.pc)]);
+	if (both_cpu)
+		printDbgReg();
+	if (complete) {
+		printLCDReg();
+	}
 }
 
 bool cmpReg() {
@@ -454,7 +467,7 @@ bool cmpMem() {
 void gbCompare() {
 	if (!cmpReg()) {
 		printf("!!!Erro nos registros!!!\n");
-		genReport();
+		genReport(true, false);
 
 		gb_cpu.pc -= 2;
 		registers.pc -= 2;
@@ -470,19 +483,19 @@ void gbCompare() {
 	}
 	if (!cmpMem()) {
 		printf("!!!Erro na memoria!!!\n");
-		genReport();
+		genReport(true, false);
 		getchar();
 	}
 
 }
 
 void DBCPU_cycle(void) {
-	//genReport();
+
+	genReport(true, false);
 	CPU_cycle();
-	cpuStep(); // Debug CPU step
+	cpuStep(); // Cinoop's CPU step
 	//getchar();
 	//system("cls");
 	gbCompare();
-	//printf("#############################\n");
-
+	printf("#############################\n");
 }

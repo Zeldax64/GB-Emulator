@@ -18,11 +18,14 @@ void TIM_updateTimers(int16_t cycles) {
 	TIM_updateDIVR(cycles); // Update Clock divider register
 
 	if (gb_tim.tmc & 0x4) { // Is counter on?
-		gb_tim.timer_counter -= cycles; 
+		printf("Tim Timer -> Decrementing TMC\n");
+		gb_tim.timer_counter -= cycles;
 		if (gb_tim.timer_counter <= 0) {
+			printf("Tim Timer -> Reseting TMC\n");
 			TIM_setClockFreq(); // Reset timer_counter
 			if (gb_tim.tima == 255) { // If overflow
 				gb_tim.tima = gb_tim.tma; // Timer register = timer modulo 
+				printf("Tim Timer -> Rquesting Interrupt\n");
 				INT_reqInt(TIM_BIT);
 			}
 			else {

@@ -218,7 +218,7 @@ uint16_t rdWord(uint16_t addr) {
 
 //Cálculo do offset?
 void wrByte(uint16_t addr, uint8_t val) {
-	switch (addr & 0xF) {
+	switch (addr & 0xF000) {
 
 	case 0x0000:
 	case 0x1000:

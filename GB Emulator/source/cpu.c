@@ -24,16 +24,19 @@ void CPU_cycle(void) {
 
 /*----- Flag calculator functions -----*/
 void flagC8(uint8_t val1, uint8_t val2) { // Flag C calculator for 8-Bit register
+	CLEAR_C;
 	if ((uint16_t)val1 + val2 & 0x100)
 		gb_cpu.f |= FLAGC;
 }
 
 void flagC16(uint16_t val1, uint16_t val2) { // Flag C calculator for 16-Bit register
+	CLEAR_C;
 	if ((uint32_t)val1 + val2 & 0x10000)
 		gb_cpu.f |= FLAGC;
 }
 
 void flagC8Sub(uint8_t val1, uint8_t val2) { // Flag C calculator for 8-Bit register
+	CLEAR_C;
 	if ((int16_t)val1 - val2 < 0)
 		gb_cpu.f |= FLAGC;
 }
@@ -41,26 +44,31 @@ void flagC8Sub(uint8_t val1, uint8_t val2) { // Flag C calculator for 8-Bit regi
 // NOTA
 // DIFFERENT
 void flagH8(uint8_t val1, uint8_t val2) { // Flag H calculator for 8-Bit register
-	if (((val1 &= 0xF) + (val2 &= 0xF)) & 0x10)
+	CLEAR_H;
+	if (((val1 & 0xF) + (val2 & 0xF)) & 0x10)
 		gb_cpu.f |= FLAGH;
 }
 
 void flagH16(uint16_t val1, uint16_t val2) { // Flag H calculator for 16-Bit register
-	if (((val1 &= 0xFFF) + (val2 &= 0xFFF)) & 0x1000)
+	CLEAR_H;
+	if (((val1 & 0xFFF) + (val2 & 0xFFF)) & 0x1000)
 		gb_cpu.f |= FLAGH;
 }
 
 void flagH8Sub(uint8_t val1, uint8_t val2) { // Flag H calculator for 8-Bit register
-	if (((val1 &= 0xF) - (val2 &= 0xF)) < 0)
+	CLEAR_H;
+	if (((val1 & 0xF) - (val2 & 0xF)) < 0)
 		gb_cpu.f |= FLAGH;
 }
 
 void flagZ8(uint8_t val) { // Flag Z calculator for 8-Bit register
+	CLEAR_Z;
 	if (val == 0)
 		gb_cpu.f |= FLAGZ;
 }
 
 void flagZ16(uint16_t val) {
+	CLEAR_Z;
 	if (val == 0)
 		gb_cpu.f |= FLAGZ;
 }
