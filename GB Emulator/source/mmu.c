@@ -375,13 +375,13 @@ void wrByte(uint16_t addr, uint8_t val) {
 				// I/O control handling
 				switch (addr & 0xFFFF) {
 				//case 0x0000: Do something with keys.
-				case TIM_DIVR: GB_tim.divr = 0;   break; // 0xFF04
-				case TIM_TIMA: GB_tim.tima = val; break; // 0xFF05
-				case TIM_TMA:  GB_tim.tma = val;  break; // 0xFF06
-				case TIM_TMC:  GB_tim.tmc = val;  break; // 0xFF07
-				case INT_REQ:  GB_int.int_req = val; break;  // 0xFF0F
+				case TIM_DIVR: gb_tim.divr = 0;   break; // 0xFF04
+				case TIM_TIMA: gb_tim.tima = val; break; // 0xFF05
+				case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
+				case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
+				case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
 				case DMA_ADDR: DMA_doDMA(val); break;		 // 0xFF46	
-				case INT_ENA:  GB_int.int_ena = val;  break; // 0xFFFF
+				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
 				case LCD_WY:   gb_lcd.wy = val;	  // 0xFF4A
 				case LCD_WX:   gb_lcd.wx = val;	  // 0xFF4B
