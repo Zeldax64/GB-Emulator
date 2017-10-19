@@ -51,7 +51,7 @@ void matchMMU() {
 
 void debugCycle() {
 	matchMMU();
-	dbreset();
+	//dbreset();
 
 	while (true) {
 		DBCPU_cycle();

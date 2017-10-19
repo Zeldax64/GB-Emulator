@@ -494,7 +494,7 @@ void DBCPU_cycle(void) {
 	genReport(true, false);
 	CPU_cycle();
 	cpuStep(); // Cinoop's CPU step
-	//getchar();
+	getchar();
 	//system("cls");
 	gbCompare();
 	printf("#############################\n");

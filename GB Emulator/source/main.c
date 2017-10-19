@@ -84,22 +84,24 @@ void emulatorInit(void) {
 	MMU_init();
 }
 
-int cycles_this_update = 0;
+uint16_t cycles_this_update = 0;
 
 void emulateCycle(void) {
 	const int MAXCYCLES = 17477; // Machine Cycles
 	while (cycles_this_update < MAXCYCLES) {
 		printf("--- Cycle: %d ---\n", cycles_this_update);
-		getchar();  // Wait for input (enter)
+		//getchar();  // Wait for input (enter)
 		genReport(false, true); // Generate report
 		CPU_cycle(); // Runs one cycle
 		cycles_this_update += gb_cpu.m;
-		gb_cpu.m = 0;
 		TIM_updateTimers(gb_cpu.m);
 		LCD_update(gb_cpu.m);
+		gb_cpu.m = 0;
 		INT_doInt();
 		printf("-----------------\n");
 	}
+	printf("LCD Render\n");
+	getchar();
 	LCD_renderScreen();
 	cycles_this_update -= MAXCYCLES;
 }
@@ -110,10 +112,10 @@ char* filename = "gbbios.gb";
 
 int main(int argc, char *argv[]) {
 	//GFX_init();
-	emulatorInit();
+	//emulatorInit();
 	gb_cpu.pc = 0x0;
 	loadROM(filename);
-	//debugCycle();
+	debugCycle();
 	
 	while (true)
 		emulateCycle();
