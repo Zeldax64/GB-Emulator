@@ -597,11 +597,252 @@ void SWAPHLm();
 
 /*---- Bit Operations -----*/
 void BITr(uint8_t bit, uint8_t reg);
-void BITHL(uint8_t bit);
+
+void BIT0a();
+void BIT0b();
+void BIT0c();
+void BIT0d();
+void BIT0e();
+void BIT0h();
+void BIT0l();
+
+void BIT1a();
+void BIT1b();
+void BIT1c();
+void BIT1d();
+void BIT1e();
+void BIT1h();
+void BIT1l();
+
+void BIT2a();
+void BIT2b();
+void BIT2c();
+void BIT2d();
+void BIT2e();
+void BIT2h();
+void BIT2l();
+
+void BIT3a();
+void BIT3b();
+void BIT3c();
+void BIT3d();
+void BIT3e();
+void BIT3h();
+void BIT3l();
+
+void BIT4a();
+void BIT4b();
+void BIT4c();
+void BIT4d();
+void BIT4e();
+void BIT4h();
+void BIT4l();
+
+void BIT5a();
+void BIT5b();
+void BIT5c();
+void BIT5d();
+void BIT5e();
+void BIT5h();
+void BIT5l();
+
+void BIT6a();
+void BIT6b();
+void BIT6c();
+void BIT6d();
+void BIT6e();
+void BIT6h();
+void BIT7l();
+
+void BIT7a();
+void BIT7b();
+void BIT7c();
+void BIT7d();
+void BIT7e();
+void BIT7h();
+void BIT7l();
+
+// End
+
+// BIT b, (HL) functions. Each one represents a possibility to bit
+void BITHLm(uint8_t bit);
+
+void BIT0HLm();
+void BIT1HLm();
+void BIT2HLm();
+void BIT3HLm();
+void BIT4HLm();
+void BIT5HLm();
+void BIT6HLm();
+void BIT7HLm();
+
+// End
+
+// SET b, r functions. Each one represents a possibility to a bit and r
 void SETr(uint8_t bit, uint8_t *reg);
-void SETHL(uint8_t bit);
+
+void SET0a();
+void SET0b();
+void SET0c();
+void SET0d();
+void SET0e();
+void SET0h();
+void SET0l();
+
+void SET1a();
+void SET1b();
+void SET1c();
+void SET1d();
+void SET1e();
+void SET1h();
+void SET1l();
+
+void SET2a();
+void SET2b();
+void SET2c();
+void SET2d();
+void SET2e();
+void SET2h();
+void SET2l();
+
+void SET3a();
+void SET3b();
+void SET3c();
+void SET3d();
+void SET3e();
+void SET3h();
+void SET3l();
+
+void SET4a();
+void SET4b();
+void SET4c();
+void SET4d();
+void SET4e();
+void SET4h();
+void SET4l();
+
+void SET5a();
+void SET5b();
+void SET5c();
+void SET5d();
+void SET5e();
+void SET5h();
+void SET5l();
+
+void SET6a();
+void SET6b();
+void SET6c();
+void SET6d();
+void SET6e();
+void SET6h();
+void SET6l();
+
+void SET7a();
+void SET7b();
+void SET7c();
+void SET7d();
+void SET7e();
+void SET7h();
+void SET7l();
+
+// End
+
+// SET b, (HL) functions. Each one represents a possibility to a bit
+void SETHLm(uint8_t bit);
+
+void SET0HLm();
+void SET1HLm();
+void SET2HLm();
+void SET3HLm();
+void SET4HLm();
+void SET5HLm();
+void SET6HLm();
+void SET7HLm();
+
+// End
+
+// RES b, r functions. Each one represents a possibility to a bit and r
 void RESr(uint8_t bit, uint8_t *reg);
-void RESHL(uint8_t bit);
+
+void RES0a();
+void RES0b();
+void RES0c();
+void RES0d();
+void RES0e();
+void RES0h();
+void RES0l();
+
+void RES1a();
+void RES1b();
+void RES1c();
+void RES1d();
+void RES1e();
+void RES1h();
+void RES1l();
+
+void RES2a();
+void RES2b();
+void RES2c();
+void RES2d();
+void RES2e();
+void RES2h();
+void RES2l();
+
+void RES3a();
+void RES3b();
+void RES3c();
+void RES3d();
+void RES3e();
+void RES3h();
+void RES3l();
+
+void RES4a();
+void RES4b();
+void RES4c();
+void RES4d();
+void RES4e();
+void RES4h();
+void RES4l();
+
+void RES5a();
+void RES5b();
+void RES5c();
+void RES5d();
+void RES5e();
+void RES5h();
+void RES5l();
+
+void RES6a();
+void RES6b();
+void RES6c();
+void RES6d();
+void RES6e();
+void RES6h();
+void RES6l();
+
+void RES7a();
+void RES7b();
+void RES7c();
+void RES7d();
+void RES7e();
+void RES7h();
+void RES7l();
+
+// End
+
+// RES b, (HL) functions. Each one represents a possibility to a bit
+void RESHLm(uint8_t bit);
+
+void RES0HLm();
+void RES1HLm();
+void RES2HLm();
+void RES3HLm();
+void RES4HLm();
+void RES5HLm();
+void RES6HLm();
+void RES7HLm();
+
+// End
 
 /*----- Jump Instructions -----*/
 void JPnn();

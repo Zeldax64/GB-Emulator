@@ -22,6 +22,11 @@ void CPU_cycle(void) {
 	(*instructions[op])();
 }
 
+void CB(void) {
+	(*CBinstructions[rdByte(gb_cpu.pc)])();
+}
+
+
 /*----- Flag calculator functions -----*/
 void flagC8(uint8_t val1, uint8_t val2) { // Flag C calculator for 8-Bit register
 	CLEAR_C;
@@ -1139,6 +1144,7 @@ void SWAPHLm() { // SWAP (HL)
 }
 
 /*---- Bit Operations -----*/
+// BIT b, r functions. Each one represents a possibility to a bit and r
 void BITr(uint8_t bit, uint8_t reg) { // Bit b, r
 	CLEAR_N;
 	gb_cpu.f = (bit & reg) ? 0 : FLAGZ;
@@ -1148,7 +1154,74 @@ void BITr(uint8_t bit, uint8_t reg) { // Bit b, r
 	gb_cpu.pc += 2;
 }
 
-void BITHL(uint8_t bit) { // BIT b, (HL)
+void BIT0a() { BITr(BIT0, gb_cpu.a); }
+void BIT0b() { BITr(BIT0, gb_cpu.b); }
+void BIT0c() { BITr(BIT0, gb_cpu.c); }
+void BIT0d() { BITr(BIT0, gb_cpu.d); }
+void BIT0e() { BITr(BIT0, gb_cpu.e); }
+void BIT0h() { BITr(BIT0, gb_cpu.h); }
+void BIT0l() { BITr(BIT0, gb_cpu.l); }
+
+void BIT1a() { BITr(BIT1, gb_cpu.a); }
+void BIT1b() { BITr(BIT1, gb_cpu.b); }
+void BIT1c() { BITr(BIT1, gb_cpu.c); }
+void BIT1d() { BITr(BIT1, gb_cpu.d); }
+void BIT1e() { BITr(BIT1, gb_cpu.e); }
+void BIT1h() { BITr(BIT1, gb_cpu.h); }
+void BIT1l() { BITr(BIT1, gb_cpu.l); }
+
+void BIT2a() { BITr(BIT2, gb_cpu.a); }
+void BIT2b() { BITr(BIT2, gb_cpu.b); }
+void BIT2c() { BITr(BIT2, gb_cpu.c); }
+void BIT2d() { BITr(BIT2, gb_cpu.d); }
+void BIT2e() { BITr(BIT2, gb_cpu.e); }
+void BIT2h() { BITr(BIT2, gb_cpu.h); }
+void BIT2l() { BITr(BIT2, gb_cpu.l); }
+
+void BIT3a() { BITr(BIT3, gb_cpu.a); }
+void BIT3b() { BITr(BIT3, gb_cpu.b); }
+void BIT3c() { BITr(BIT3, gb_cpu.c); }
+void BIT3d() { BITr(BIT3, gb_cpu.d); }
+void BIT3e() { BITr(BIT3, gb_cpu.e); }
+void BIT3h() { BITr(BIT3, gb_cpu.h); }
+void BIT3l() { BITr(BIT3, gb_cpu.l); }
+
+void BIT4a() { BITr(BIT4, gb_cpu.a); }
+void BIT4b() { BITr(BIT4, gb_cpu.b); }
+void BIT4c() { BITr(BIT4, gb_cpu.c); }
+void BIT4d() { BITr(BIT4, gb_cpu.d); }
+void BIT4e() { BITr(BIT4, gb_cpu.e); }
+void BIT4h() { BITr(BIT4, gb_cpu.h); }
+void BIT4l() { BITr(BIT4, gb_cpu.l); }
+
+void BIT5a() { BITr(BIT5, gb_cpu.a); }
+void BIT5b() { BITr(BIT5, gb_cpu.b); }
+void BIT5c() { BITr(BIT5, gb_cpu.c); }
+void BIT5d() { BITr(BIT5, gb_cpu.d); }
+void BIT5e() { BITr(BIT5, gb_cpu.e); }
+void BIT5h() { BITr(BIT5, gb_cpu.h); }
+void BIT5l() { BITr(BIT5, gb_cpu.l); }
+
+void BIT6a() { BITr(BIT6, gb_cpu.a); }
+void BIT6b() { BITr(BIT6, gb_cpu.b); }
+void BIT6c() { BITr(BIT6, gb_cpu.c); }
+void BIT6d() { BITr(BIT6, gb_cpu.d); }
+void BIT6e() { BITr(BIT6, gb_cpu.e); }
+void BIT6h() { BITr(BIT6, gb_cpu.h); }
+void BIT6l() { BITr(BIT6, gb_cpu.l); }
+
+void BIT7a() { BITr(BIT7, gb_cpu.a); }
+void BIT7b() { BITr(BIT7, gb_cpu.b); }
+void BIT7c() { BITr(BIT7, gb_cpu.c); }
+void BIT7d() { BITr(BIT7, gb_cpu.d); }
+void BIT7e() { BITr(BIT7, gb_cpu.e); }
+void BIT7h() { BITr(BIT7, gb_cpu.h); }
+void BIT7l() { BITr(BIT7, gb_cpu.l); }
+
+// End
+
+// BIT b, (HL) functions. Each one represents a possibility to bit
+void BITHLm(uint8_t bit) { // BIT b, (HL)
 	CLEAR_N;
 	gb_cpu.f = (bit & rdByte(gb_cpu.hl)) ? 0 : FLAGZ;
 	gb_cpu.f |= FLAGH;
@@ -1157,6 +1230,18 @@ void BITHL(uint8_t bit) { // BIT b, (HL)
 	gb_cpu.pc += 2;
 }
 
+void BIT0HLm() { BITHLm(BIT0); }
+void BIT1HLm() { BITHLm(BIT1); }
+void BIT2HLm() { BITHLm(BIT2); }
+void BIT3HLm() { BITHLm(BIT3); }
+void BIT4HLm() { BITHLm(BIT4); }
+void BIT5HLm() { BITHLm(BIT5); }
+void BIT6HLm() { BITHLm(BIT6); }
+void BIT7HLm() { BITHLm(BIT7); }
+
+// End
+
+// SET b, r functions. Each one represents a possibility to a bit and r
 void SETr(uint8_t bit, uint8_t *reg) { // SET b, r
 	*reg |= bit;
 
@@ -1164,13 +1249,92 @@ void SETr(uint8_t bit, uint8_t *reg) { // SET b, r
 	gb_cpu.pc += 2;
 }
 
-void SETHL(uint8_t bit) { // SET (HL)
+void SET0a() { SETr(BIT0, &gb_cpu.a); }
+void SET0b() { SETr(BIT0, &gb_cpu.b); }
+void SET0c() { SETr(BIT0, &gb_cpu.c); }
+void SET0d() { SETr(BIT0, &gb_cpu.d); }
+void SET0e() { SETr(BIT0, &gb_cpu.e); }
+void SET0h() { SETr(BIT0, &gb_cpu.h); }
+void SET0l() { SETr(BIT0, &gb_cpu.l); }
+
+void SET1a() { SETr(BIT1, &gb_cpu.a); }
+void SET1b() { SETr(BIT1, &gb_cpu.b); }
+void SET1c() { SETr(BIT1, &gb_cpu.c); }
+void SET1d() { SETr(BIT1, &gb_cpu.d); }
+void SET1e() { SETr(BIT1, &gb_cpu.e); }
+void SET1h() { SETr(BIT1, &gb_cpu.h); }
+void SET1l() { SETr(BIT1, &gb_cpu.l); }
+
+void SET2a() { SETr(BIT2, &gb_cpu.a); }
+void SET2b() { SETr(BIT2, &gb_cpu.b); }
+void SET2c() { SETr(BIT2, &gb_cpu.c); }
+void SET2d() { SETr(BIT2, &gb_cpu.d); }
+void SET2e() { SETr(BIT2, &gb_cpu.e); }
+void SET2h() { SETr(BIT2, &gb_cpu.h); }
+void SET2l() { SETr(BIT2, &gb_cpu.l); }
+
+void SET3a() { SETr(BIT3, &gb_cpu.a); }
+void SET3b() { SETr(BIT3, &gb_cpu.b); }
+void SET3c() { SETr(BIT3, &gb_cpu.c); }
+void SET3d() { SETr(BIT3, &gb_cpu.d); }
+void SET3e() { SETr(BIT3, &gb_cpu.e); }
+void SET3h() { SETr(BIT3, &gb_cpu.h); }
+void SET3l() { SETr(BIT3, &gb_cpu.l); }
+
+void SET4a() { SETr(BIT4, &gb_cpu.a); }
+void SET4b() { SETr(BIT4, &gb_cpu.b); }
+void SET4c() { SETr(BIT4, &gb_cpu.c); }
+void SET4d() { SETr(BIT4, &gb_cpu.d); }
+void SET4e() { SETr(BIT4, &gb_cpu.e); }
+void SET4h() { SETr(BIT4, &gb_cpu.h); }
+void SET4l() { SETr(BIT4, &gb_cpu.l); }
+
+void SET5a() { SETr(BIT5, &gb_cpu.a); }
+void SET5b() { SETr(BIT5, &gb_cpu.b); }
+void SET5c() { SETr(BIT5, &gb_cpu.c); }
+void SET5d() { SETr(BIT5, &gb_cpu.d); }
+void SET5e() { SETr(BIT5, &gb_cpu.e); }
+void SET5h() { SETr(BIT5, &gb_cpu.h); }
+void SET5l() { SETr(BIT5, &gb_cpu.l); }
+
+void SET6a() { SETr(BIT6, &gb_cpu.a); }
+void SET6b() { SETr(BIT6, &gb_cpu.b); }
+void SET6c() { SETr(BIT6, &gb_cpu.c); }
+void SET6d() { SETr(BIT6, &gb_cpu.d); }
+void SET6e() { SETr(BIT6, &gb_cpu.e); }
+void SET6h() { SETr(BIT6, &gb_cpu.h); }
+void SET6l() { SETr(BIT6, &gb_cpu.l); }
+
+void SET7a() { SETr(BIT7, &gb_cpu.a); }
+void SET7b() { SETr(BIT7, &gb_cpu.b); }
+void SET7c() { SETr(BIT7, &gb_cpu.c); }
+void SET7d() { SETr(BIT7, &gb_cpu.d); }
+void SET7e() { SETr(BIT7, &gb_cpu.e); }
+void SET7h() { SETr(BIT7, &gb_cpu.h); }
+void SET7l() { SETr(BIT7, &gb_cpu.l); }
+
+// End
+
+// SET b, (HL) functions. Each one represents a possibility to a bit
+void SETHLm(uint8_t bit) { // SET (HL)
 	wrByte(gb_cpu.hl, rdByte(gb_cpu.hl) | bit);
 
 	gb_cpu.m += 4;
 	gb_cpu.pc += 2;
 }
 
+void SET0HLm() { SETHLm(BIT0); }
+void SET1HLm() { SETHLm(BIT1); }
+void SET2HLm() { SETHLm(BIT2); }
+void SET3HLm() { SETHLm(BIT3); }
+void SET4HLm() { SETHLm(BIT4); }
+void SET5HLm() { SETHLm(BIT5); }
+void SET6HLm() { SETHLm(BIT6); }
+void SET7HLm() { SETHLm(BIT7); }
+
+// End
+
+// RES b, r functions. Each one represents a possibility to a bit and r
 void RESr(uint8_t bit, uint8_t *reg) {
 	*reg &= !bit;
 
@@ -1178,12 +1342,90 @@ void RESr(uint8_t bit, uint8_t *reg) {
 	gb_cpu.pc += 2;
 }
 
-void RESHL(uint8_t bit) {
+void RES0a() { RESr(BIT0, &gb_cpu.a); }
+void RES0b() { RESr(BIT0, &gb_cpu.b); }
+void RES0c() { RESr(BIT0, &gb_cpu.c); }
+void RES0d() { RESr(BIT0, &gb_cpu.d); }
+void RES0e() { RESr(BIT0, &gb_cpu.e); }
+void RES0h() { RESr(BIT0, &gb_cpu.h); }
+void RES0l() { RESr(BIT0, &gb_cpu.l); }
+
+void RES1a() { RESr(BIT1, &gb_cpu.a); };
+void RES1b() { RESr(BIT1, &gb_cpu.b); };
+void RES1c() { RESr(BIT1, &gb_cpu.c); };
+void RES1d() { RESr(BIT1, &gb_cpu.d); };
+void RES1e() { RESr(BIT1, &gb_cpu.e); };
+void RES1h() { RESr(BIT1, &gb_cpu.h); };
+void RES1l() { RESr(BIT1, &gb_cpu.l); };
+
+void RES2a() { RESr(BIT2, &gb_cpu.a); };
+void RES2b() { RESr(BIT2, &gb_cpu.b); };
+void RES2c() { RESr(BIT2, &gb_cpu.c); };
+void RES2d() { RESr(BIT2, &gb_cpu.d); };
+void RES2e() { RESr(BIT2, &gb_cpu.e); };
+void RES2h() { RESr(BIT2, &gb_cpu.h); };
+void RES2l() { RESr(BIT2, &gb_cpu.l); };
+
+void RES3a() { RESr(BIT3, &gb_cpu.a); };
+void RES3b() { RESr(BIT3, &gb_cpu.b); };
+void RES3c() { RESr(BIT3, &gb_cpu.c); };
+void RES3d() { RESr(BIT3, &gb_cpu.d); };
+void RES3e() { RESr(BIT3, &gb_cpu.e); };
+void RES3h() { RESr(BIT3, &gb_cpu.h); };
+void RES3l() { RESr(BIT3, &gb_cpu.l); };
+
+void RES4a() { RESr(BIT4, &gb_cpu.a); };
+void RES4b() { RESr(BIT4, &gb_cpu.b); };
+void RES4c() { RESr(BIT4, &gb_cpu.c); };
+void RES4d() { RESr(BIT4, &gb_cpu.d); };
+void RES4e() { RESr(BIT4, &gb_cpu.e); };
+void RES4h() { RESr(BIT4, &gb_cpu.h); };
+void RES4l() { RESr(BIT4, &gb_cpu.l); };
+
+void RES5a() { RESr(BIT5, &gb_cpu.a); };
+void RES5b() { RESr(BIT5, &gb_cpu.b); };
+void RES5c() { RESr(BIT5, &gb_cpu.c); };
+void RES5d() { RESr(BIT5, &gb_cpu.d); };
+void RES5e() { RESr(BIT5, &gb_cpu.e); };
+void RES5h() { RESr(BIT5, &gb_cpu.h); };
+void RES5l() { RESr(BIT5, &gb_cpu.l); };
+
+void RES6a() { RESr(BIT6, &gb_cpu.a); }
+void RES6b() { RESr(BIT6, &gb_cpu.b); }
+void RES6c() { RESr(BIT6, &gb_cpu.c); }
+void RES6d() { RESr(BIT6, &gb_cpu.d); }
+void RES6e() { RESr(BIT6, &gb_cpu.e); }
+void RES6h() { RESr(BIT6, &gb_cpu.h); }
+void RES6l() { RESr(BIT6, &gb_cpu.l); }
+
+void RES7a() { RESr(BIT7, &gb_cpu.a); }
+void RES7b() { RESr(BIT7, &gb_cpu.b); }
+void RES7c() { RESr(BIT7, &gb_cpu.c); }
+void RES7d() { RESr(BIT7, &gb_cpu.d); }
+void RES7e() { RESr(BIT7, &gb_cpu.e); }
+void RES7h() { RESr(BIT7, &gb_cpu.h); }
+void RES7l() { RESr(BIT7, &gb_cpu.l); }
+
+// End
+
+// RES b, (HL) functions. Each one represents a possibility to a bit 
+void RESHLm(uint8_t bit) {
 	wrByte(gb_cpu.hl, rdByte(gb_cpu.hl) & !bit);
 
 	gb_cpu.m += 4;
 	gb_cpu.pc += 2;
 }
+
+void RES0HLm() { RESHLm(BIT0); }
+void RES1HLm() { RESHLm(BIT1); }
+void RES2HLm() { RESHLm(BIT2); }
+void RES3HLm() { RESHLm(BIT3); }
+void RES4HLm() { RESHLm(BIT4); }
+void RES5HLm() { RESHLm(BIT5); }
+void RES6HLm() { RESHLm(BIT6); }
+void RES7HLm() { RESHLm(BIT7); }
+
+// End
 
 /*----- Jump Instructions -----*/
 void JPnn() { // JP nn
@@ -1592,10 +1834,6 @@ void CPU_NULL(void) {
 }
 
 // Prefixed CB instructions
-void CB(void) {
-	printf("CB instruction \n");
-	getchar();
-}
 
 const void(*instructions[0x100])() = {
 	// 0x00
@@ -1709,11 +1947,87 @@ const void(*CBinstructions[0x100])() = {
 	RRh, RRl, RRHLm, RRa,
 
 	// 0x20
+	SLAb, SLAc, SLAd, SLAe,
+	SLAh, SLAl, SLAHLm, SLAa,
+	SRAb, SRAc, SRAd, SRAe,
+	SRAh, SRAl, SRAHLm, SRAa,
+
+	// 0x30
 	SWAPb, SWAPc, SWAPd, SWAPe,
 	SWAPh, SWAPl, SWAPHLm, SWAPa,
 	SRLb, SRLc, SRLd, SRLe,
 	SRLh, SRLl, SRLHLm, SRLa,
 
-	// 0x30
-	// NOTA: Stopped here!
+	// 0x40
+	BIT0b, BIT0c, BIT0d, BIT0e,
+	BIT0h, BIT0l, BIT0HLm, BIT0a,
+	BIT1b, BIT1c, BIT1d, BIT1e,
+	BIT1h, BIT1l, BIT1HLm, BIT1a,
+
+	// 0x50
+	BIT2b, BIT2c, BIT2d, BIT2e,
+	BIT2h, BIT2l, BIT2HLm, BIT2a,
+	BIT3b, BIT3c, BIT3d, BIT3e,
+	BIT3h, BIT3l, BIT3HLm, BIT3a,
+
+	// 0x60
+	BIT4b, BIT4c, BIT4d, BIT4e,
+	BIT4h, BIT4l, BIT4HLm, BIT4a,
+	BIT5b, BIT5c, BIT5d, BIT5e,
+	BIT5h, BIT5l, BIT5HLm, BIT5a,
+
+	// 0x70
+	BIT6b, BIT6c, BIT6d, BIT6e,
+	BIT6h, BIT6l, BIT6HLm, BIT6a,
+	BIT7b, BIT7c, BIT7d, BIT7e,
+	BIT7h, BIT7l, BIT7HLm, BIT7a,
+
+	// 0x80
+	RES0b, RES0c, RES0d, RES0e,
+	RES0h, RES0l, RES0HLm, RES0a,
+	RES1b, RES1c, RES1d, RES1e,
+	RES1h, RES1l, RES1HLm, RES1a,
+
+	// 0x90
+	RES2b, RES2c, RES2d, RES2e,
+	RES2h, RES2l, RES2HLm, RES2a,
+	RES3b, RES3c, RES3d, RES3e,
+	RES3h, RES3l, RES3HLm, RES3a,
+
+	// 0xA0
+	RES4b, RES4c, RES4d, RES4e,
+	RES4h, RES4l, RES4HLm, RES4a,
+	RES5b, RES5c, RES5d, RES5e,
+	RES5h, RES5l, RES5HLm, RES5a,
+
+	// 0xB0
+	SET6b, SET6c, SET6d, SET6e,
+	SET6h, SET6l, SET6HLm, SET6a,
+	SET7b, SET7c, SET7d, SET7e,
+	SET7h, SET7l, SET7HLm, SET7a,
+
+	// 0xC0
+	SET0b, SET0c, SET0d, SET0e,
+	SET0h, SET0l, SET0HLm, SET0a,
+	SET1b, SET1c, SET1d, SET1e,
+	SET1h, SET1l, SET1HLm, SET1a,
+
+	// 0xD0
+	SET2b, SET2c, SET2d, SET2e,
+	SET2h, SET2l, SET2HLm, SET2a,
+	SET3b, SET3c, SET3d, SET3e,
+	SET3h, SET3l, SET3HLm, SET3a,
+
+	// 0xE0
+	SET4b, SET4c, SET4d, SET4e,
+	SET4h, SET4l, SET4HLm, SET4a,
+	SET5b, SET5c, SET5d, SET5e,
+	SET5h, SET5l, SET5HLm, SET5a,
+
+	// 0xF0
+	SET6b, SET6c, SET6d, SET6e,
+	SET6h, SET6l, SET6HLm, SET6a,
+	SET7b, SET7c, SET7d, SET7e,
+	SET7h, SET7l, SET7HLm, SET7a,
+
 };

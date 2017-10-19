@@ -104,11 +104,14 @@ void emulateCycle(void) {
 	cycles_this_update -= MAXCYCLES;
 }
 
-char* filename = "C:\\Users\\caiox\\Documents\\Emulators\\GB\\ROMs\\Tetris\\Tetris.gb";
+//char* filename = "C:\\Users\\caiox\\Documents\\Emulators\\GB\\ROMs\\Tetris\\Tetris.gb";
+//char* filename = "Tetris.gb";
+char* filename = "gbbios.gb";
 
 int main(int argc, char *argv[]) {
 	//GFX_init();
 	emulatorInit();
+	gb_cpu.pc = 0x0;
 	loadROM(filename);
 	//debugCycle();
 	
