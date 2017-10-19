@@ -85,23 +85,37 @@ void emulatorInit(void) {
 }
 
 uint16_t cycles_this_update = 0;
-
+int16_t maxpcounter = -1;
+bool found = false;
 void emulateCycle(void) {
 	const int MAXCYCLES = 17477; // Machine Cycles
 	while (cycles_this_update < MAXCYCLES) {
-		printf("--- Cycle: %d ---\n", cycles_this_update);
-		//getchar();  // Wait for input (enter)
+		printf("--- Cycle: %d ---\n", cycles_this_update);		
 		genReport(false, true); // Generate report
+		
 		CPU_cycle(); // Runs one cycle
+
 		cycles_this_update += gb_cpu.m;
 		TIM_updateTimers(gb_cpu.m);
 		LCD_update(gb_cpu.m);
-		gb_cpu.m = 0;
 		INT_doInt();
+		gb_cpu.m = 0;
+		/*if (gb_cpu.pc > maxpcounter) {
+			maxpcounter = gb_cpu.pc;
+			printf("Max PC: %x\n", maxpcounter);
+		}*/
 		printf("-----------------\n");
+
+		if (gb_cpu.pc == 0x000c) {
+			found = true;
+			getchar();
+		}
+		if (found) {
+			getchar();
+		}
 	}
 	printf("LCD Render\n");
-	getchar();
+	//getchar();
 	LCD_renderScreen();
 	cycles_this_update -= MAXCYCLES;
 }
@@ -114,12 +128,15 @@ int main(int argc, char *argv[]) {
 	//GFX_init();
 	//emulatorInit();
 	gb_cpu.pc = 0x0;
+	registers.pc = 0x0;
 	loadROM(filename);
-	debugCycle();
+	//debugCycle();
 	
 	while (true)
 		emulateCycle();
 
-	return 0;
+	//return 0;
+
+	//DBMMU_testRdWr(&gb_mmu);
 }
 

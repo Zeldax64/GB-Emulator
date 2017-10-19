@@ -311,7 +311,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 			//Caso implementado a partir do que foi observado no documento "GBCPUman.pdf",
 			//porém ao comparar com o código do tutorial, está diferente.
 		case 0xE00:
-			if ((addr & 0xFF) < 0x9F) {
+			if ((addr & 0xFF) <= 0x9F) {
 				gb_mmu.oam[addr & 0xFF] = val;
 				//updateoam(addr, val); // GPU
 			}
