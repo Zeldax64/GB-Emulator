@@ -59,34 +59,58 @@ void MMU_init() {
 }
 
 
-void load(char * file){
-	/*
-	uint8_t sz;
-	uint8_t buffer;
-	uint8_t i;
+bool loadROM(char * filename) {
+	uint32_t size;
+	uint8_t *buffer;
 
-	FILE * program = fopen(file, "rb");
-	fseek(program, 0L, SEEK_END);
-	sz = ftell(program);
-	fseek(program, 0L, SEEK_SET);
-	fread(&buffer,sz,1,program);
+	gameName = filename;
 
-	for(i = 0; i<sz; i++){
+	FILE *file = fopen(filename, "rb");
+	if (file == NULL) {
+		printf("File couldn't be found\n");
+		return false;
+	}
+
+	// Check file size
+	fseek(file, 0L, SEEK_END);
+	size = ftell(file);
+
+	// Return file pointer to begin of file
+	rewind(file);
+
+	//Check the value of size and adapt it
+	if (size > 0x8000) {
+		size = 0x8000;
+	}
+
+	buffer = (uint8_t*)malloc(sizeof(uint8_t) * size);
+	if (buffer == NULL) {
+		printf("Memory error\n");
+		return false;
+	}
+
+	// Copy the file into the buffer
+	size_t result = fread(buffer, 1, size, file);
+
+	if (result != size) {
+		printf("Reading error\n");
+		return false;
+	}
+
+	for (uint32_t i = 0; i < size; i++) {
 		gb_mmu.rom[i] = buffer[i];
-	} 
-	*/
-	/*
-		Reads the cartridge type. It's important to know
-		if it's necessary to swap rom banks.
-		MBC 1:
-		1 = 
-		2 =
-		3 =
-		5, and 6 = MBC2
-	*/
+	}
+
+
+	fclose(file);
+	free(buffer);
+
 	gb_mmu.carttype = gb_mmu.rom[0x0147];
 
+	return true;
+
 }
+
 
 // Nota: Fix warnings!
 void reset(){
@@ -214,35 +238,50 @@ uint16_t rdWord(uint16_t addr) {
 	return rdByte(addr) + (rdByte(addr + 1) << 8);
 }
 
-
-
-//Cálculo do offset?
 void wrByte(uint16_t addr, uint8_t val) {
 	switch (addr & 0xF000) {
-
+	// Enable or Disable RAM
 	case 0x0000:
 	case 0x1000:
 		switch (gb_mmu.carttype) {
+		case 1:
+		case 2:
 		case 3:
 			if ((val & 0xF) == 0xA) {
-				gb_mmu.mbc1.enableERam = 1;
+				gb_mmu.enableERam = 1;
 			}
 			break;
+		case 5:
+		case 6:
+			if ((val & 0xF) == 0xA && !testBit(addr, BIT3)) { // TestBit -> addr & 1000
+				gb_mmu.enableERam = 1;
+			}
+
 		}
 		break;
-
+	//Change the ROM Bank
 	case 0x2000:
 	case 0x3000:
 		switch (gb_mmu.carttype) {
+		case 1:
+		case 2:
 		case 3:
 			val = val & 0x1F;
 			if (!val) val = 1;
 
-			gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank & 0x60; // Por que isso é feito?
-			gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank | val;
+			gb_mmu.rombank = gb_mmu.rombank & 0x60;
+			gb_mmu.rombank = gb_mmu.rombank | val;
 
-			gb_mmu.romoffset = gb_mmu.mbc1.rombank * 0x4000;
+			gb_mmu.romoffset = gb_mmu.rombank * 0x4000;
 
+			if (gb_mmu.rombank == 0) gb_mmu.rombank = 1;
+			swapROM();
+			break;
+		case 5:
+		case 6:
+			gb_mmu.rombank = val & 0xF;
+			if (gb_mmu.rombank == 0) gb_mmu.rombank = 1;
+			swapROM();
 			break;
 		}
 		break;
@@ -250,27 +289,35 @@ void wrByte(uint16_t addr, uint8_t val) {
 	case 0x4000:
 	case 0x5000:
 		switch (gb_mmu.carttype) {
+		case 1:
+		case 2:
 		case 3:
 			val = val & 0x3;
-			if (gb_mmu.mbc1.mode) {
-				gb_mmu.mbc1.rambank = val;
-				gb_mmu.ramoffset = gb_mmu.mbc1.rambank * 0x2000;// Por que esse offset?
+			// Change the RAM Bank
+			if (gb_mmu.mode) {
+				gb_mmu.rambank = val;
+				gb_mmu.ramoffset = gb_mmu.rambank * 0x2000;
 			}
+			// change the ROM Bank [PROBLEM] [Using the GCPUMan Tutorial]
 			else {
-				gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank & 0x1F;
-				gb_mmu.mbc1.rombank = gb_mmu.mbc1.rombank | val;
-				gb_mmu.romoffset = gb_mmu.mbc1.rombank * 0x4000;
+				gb_mmu.rombank = gb_mmu.rombank & 0x3F; // Cleaning the 2 MSB
+				val = (val & 0x3)<<6; // Cleaning the 6 LSB and shift
+				gb_mmu.rombank = gb_mmu.rombank | val;
+				gb_mmu.romoffset = gb_mmu.rombank * 0x4000;
+				swapROM();
 			}
 			break;
 		}
 		break;
-
+	//Change mode (Just for MBC1)
 	case 0x6000:
 	case 0x7000:
 		switch (gb_mmu.carttype) {
+		case 1:
+		case 2:
 		case 3:
 			val = val & 0x1;
-			gb_mmu.mbc1.mode = val;
+			gb_mmu.mode = val;
 			break;
 		}
 		break;
@@ -280,13 +327,15 @@ void wrByte(uint16_t addr, uint8_t val) {
 	case 0x9000:
 		gb_mmu.vram[addr & 0x1FFF] = val;
 		//updatetile(addr & 0x1FFF, val); // GPU
-		// É necessário implementar a GPU!!
+		//GPU is necessary!!
 		break;
 
 		// External RAM
 	case 0xA000:
 	case 0xB000:
-		gb_mmu.eram[gb_mmu.ramoffset + (addr & 0x1FFF)] = val;
+		if (gb_mmu.enableERam){
+			gb_mmu.eram[gb_mmu.ramoffset + (addr & 0x1FFF)] = val;
+		}
 		break;
 
 		// Internal RAM
@@ -305,13 +354,10 @@ void wrByte(uint16_t addr, uint8_t val) {
 			gb_mmu.wram[addr & 0x1FFF] = val;
 			break;
 
-			/* Dependem da GPU e KEY */
-			//Sprite Attribute Table
-			// OAM
-			//Caso implementado a partir do que foi observado no documento "GBCPUman.pdf",
-			//porém ao comparar com o código do tutorial, está diferente.
+		//Sprite Attribute Table
+		// OAM
 		case 0xE00:
-			if ((addr & 0xFF) < 0x9F) {
+			if ((addr & 0xFF) < 0xA0) {
 				gb_mmu.oam[addr & 0xFF] = val;
 				//updateoam(addr, val); // GPU
 			}
@@ -322,28 +368,25 @@ void wrByte(uint16_t addr, uint8_t val) {
 			if (addr == 0xFFFF)
 				gb_mmu.ie = val;
 			// Zero page is 128 bytes
-			if (addr >= 0xFF80) {
+			if (addr >= 0xFF7F) {
 				gb_mmu.zram[addr & 0x7F] = val;
 			}
 			else {
 				// I/O control handling
 				switch (addr & 0xFFFF) {
-					case TIM_DIVR: gb_tim.divr = 0;   break; // 0xFF04
-					case TIM_TIMA: gb_tim.tima = val; break; // 0xFF05
-					case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
-					case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
-					case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
-					case LCD_LCDC: gb_lcd.lcdc = val;	  // 0xFF40
-					case LCD_STAT: gb_lcd.stat = val;	  // 0xFF41
-					case LCD_SCY:  gb_lcd.scy = val;	  // 0xFF42
-					case LCD_SCX:  gb_lcd.scx = val;	  // 0xFF43
-					case LCD_LY:   gb_lcd.ly = val;	  // 0xFF44
-					case LCD_LYC:  gb_lcd.lyc = val;	  // 0xFF45
-					case DMA_ADDR: DMA_doDMA(val); break;		 // 0xFF46	
-					case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
-					case LCD_WY:   gb_lcd.wy = val;	  // 0xFF4A
-					case LCD_WX:   gb_lcd.wx = val;	  // 0xFF4B
-					case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
+				//case 0x0000: Do something with keys.
+				case TIM_DIVR: GB_tim.divr = 0;   break; // 0xFF04
+				case TIM_TIMA: GB_tim.tima = val; break; // 0xFF05
+				case TIM_TMA:  GB_tim.tma = val;  break; // 0xFF06
+				case TIM_TMC:  GB_tim.tmc = val;  break; // 0xFF07
+				case INT_REQ:  GB_int.int_req = val; break;  // 0xFF0F
+				case DMA_ADDR: DMA_doDMA(val); break;		 // 0xFF46	
+				case INT_ENA:  GB_int.int_ena = val;  break; // 0xFFFF
+				case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
+				case LCD_WY:   gb_lcd.wy = val;	  // 0xFF4A
+				case LCD_WX:   gb_lcd.wx = val;	  // 0xFF4B
+				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
+				// It's necessary to implement more written about the GPU.
 				}
 			}
 		}
@@ -434,4 +477,46 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 			}
 		}
 	}
+}
+
+uint8_t * getAtAddr(uint16_t addr, uint16_t size) {
+
+	uint8_t * buffer;
+
+	buffer = (uint8_t*)malloc(sizeof(uint8_t) * size);
+
+	FILE *file = fopen(gameName, "rb");
+
+	if (file == NULL) {
+		printf("File couldn't be found\n");
+		return NULL;
+	}
+
+	fseek(file, addr, SEEK_SET);
+
+	size_t result = fread(buffer, 1, size, file);
+
+	if (result != size) {
+		printf("Reading error\n");
+		return NULL;
+	}
+
+	return buffer;
+}
+
+//"mmu.rom" divided in two parts
+void swapROM() {
+	uint16_t i;
+	uint8_t * buffer;
+	if (gb_mmu.rombank == 0) {
+		buffer = getAtAddr(0x4000, 0x4000);
+	}
+	else {
+		buffer = getAtAddr(gb_mmu.rombank * 0x4000, 0x4000);
+	}
+
+	for (i = 0; i<0x4000; i++) {
+		gb_mmu.rom[i + 0x4000] = buffer[i];
+	}
+
 }
