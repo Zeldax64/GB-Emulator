@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "debugcpu.h"
+#include "debugmmu.h"
 
 #include "db_mmu.h"
 
