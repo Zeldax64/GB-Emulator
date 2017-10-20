@@ -84,35 +84,43 @@ void emulatorInit(void) {
 	MMU_init();
 }
 
-uint16_t cycles_this_update = 0;
+
 int16_t maxpcounter = -1;
 bool found = false;
-void emulateCycle(void) {
+
+int16_t emulateCycle(int16_t cycles) {
+	printf("--- Cycle: %d ---\n", cycles);
+	genReport(false, true); // Generate report
+
+	CPU_cycle(); // Runs one cycle
+
+	cycles += gb_cpu.m;
+	TIM_updateTimers(gb_cpu.m);
+	LCD_update(gb_cpu.m);
+	INT_doInt();
+	gb_cpu.m = 0;
+	/*if (gb_cpu.pc > maxpcounter) {
+	maxpcounter = gb_cpu.pc;
+	printf("Max PC: %x\n", maxpcounter);
+	}*/
+	printf("-----------------\n");
+
+	if (gb_cpu.pc == 0x000c) {
+		found = true;
+		getchar();
+	}
+	if (found) {
+		getchar();
+	}
+
+	return cycles;
+}
+
+int16_t cycles_this_update = 0;
+void emulateFrame(void) {
 	const int MAXCYCLES = 17477; // Machine Cycles
 	while (cycles_this_update < MAXCYCLES) {
-		printf("--- Cycle: %d ---\n", cycles_this_update);		
-		genReport(false, true); // Generate report
-		
-		CPU_cycle(); // Runs one cycle
-
-		cycles_this_update += gb_cpu.m;
-		TIM_updateTimers(gb_cpu.m);
-		LCD_update(gb_cpu.m);
-		INT_doInt();
-		gb_cpu.m = 0;
-		/*if (gb_cpu.pc > maxpcounter) {
-			maxpcounter = gb_cpu.pc;
-			printf("Max PC: %x\n", maxpcounter);
-		}*/
-		printf("-----------------\n");
-
-		if (gb_cpu.pc == 0x000c) {
-			found = true;
-			getchar();
-		}
-		if (found) {
-			getchar();
-		}
+		cycles_this_update = emulateCycle(cycles_this_update);
 	}
 	printf("LCD Render\n");
 	//getchar();
@@ -133,7 +141,7 @@ int main(int argc, char *argv[]) {
 	//debugCycle();
 	
 	while (true)
-		emulateCycle();
+		emulateFrame();
 
 	//return 0;
 

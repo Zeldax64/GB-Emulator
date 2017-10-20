@@ -21,7 +21,7 @@
 
 /*----- Function Prototypes -----*/
 void MMU_init();
-bool loadROM(char * filename);
+bool MMU_loadROM(char * filename);
 void reset();
 uint8_t rdByte(uint16_t addr);
 uint16_t rdWord(uint16_t addr);
@@ -63,6 +63,4 @@ GB_MMU gb_mmu;
 
 char * gameName;
 
-
-#endif
 

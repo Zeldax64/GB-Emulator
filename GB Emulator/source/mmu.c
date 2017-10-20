@@ -59,7 +59,7 @@ void MMU_init() {
 }
 
 
-bool loadROM(char * filename) {
+bool MMU_loadROM(char * filename) {
 	uint32_t size;
 	uint8_t *buffer;
 
@@ -116,10 +116,10 @@ bool loadROM(char * filename) {
 void reset(){
 
 	//Reset MBC1
-	gb_mmu.mbc1.rombank = 0;
-	gb_mmu.mbc1.rambank = 0;
-	gb_mmu.mbc1.enableERam = 0;
-	gb_mmu.mbc1.mode = 0;
+	gb_mmu.rombank = 0;
+	gb_mmu.rambank = 0;
+	gb_mmu.enableERam = 0;
+	gb_mmu.mode = 0;
 
 	gb_mmu.romoffset = 0x4000;
 	gb_mmu.ramoffset = 0x0000;
@@ -380,11 +380,15 @@ void wrByte(uint16_t addr, uint8_t val) {
 				case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
 				case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
 				case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
-				case DMA_ADDR: DMA_doDMA(val); break;		 // 0xFF46	
-				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
-				case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
-				case LCD_WY:   gb_lcd.wy = val;	  // 0xFF4A
-				case LCD_WX:   gb_lcd.wx = val;	  // 0xFF4B
+				case LCD_LCDC: return gb_lcd.lcdc;	  // 0xFF40
+				case LCD_STAT: return gb_lcd.stat;	  // 0xFF41
+				case LCD_SCY:  return gb_lcd.scy;	  // 0xFF42
+				case LCD_SCX:  return gb_lcd.scx;	  // 0xFF43
+				case LCD_LY:   return gb_lcd.ly;	  // 0xFF44
+				case LCD_LYC:  return gb_lcd.lyc;	  // 0xFF45
+				case LCD_BGP:  return gb_lcd.bgp;	  // 0xFF47
+				case LCD_WY:   return gb_lcd.wy;	  // 0xFF4A
+				case LCD_WX:   return gb_lcd.wx;	  // 0xFF4B
 				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				// It's necessary to implement more written about the GPU.
 				}
