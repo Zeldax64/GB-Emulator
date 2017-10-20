@@ -149,7 +149,8 @@ void LCD_renderTiles() {
 			background_memory = LCD_BG_MEM_0;
 	}
 	/////////////////
-	uint8_t ypos = 0; // ypos is used to calculate which of 32 vertical tiles the current scanline is drawing
+	// ypos is used to calculate which of 32 vertical tiles the current scanline is drawing
+	uint8_t ypos = 0; 
 
 	if (!using_window)
 		ypos = gb_lcd.scy + gb_lcd.ly; // LY-Current scanline

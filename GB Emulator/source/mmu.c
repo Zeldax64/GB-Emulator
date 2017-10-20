@@ -380,15 +380,15 @@ void wrByte(uint16_t addr, uint8_t val) {
 				case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
 				case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
 				case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
-				case LCD_LCDC: return gb_lcd.lcdc;	  // 0xFF40
-				case LCD_STAT: return gb_lcd.stat;	  // 0xFF41
-				case LCD_SCY:  return gb_lcd.scy;	  // 0xFF42
-				case LCD_SCX:  return gb_lcd.scx;	  // 0xFF43
-				case LCD_LY:   return gb_lcd.ly;	  // 0xFF44
-				case LCD_LYC:  return gb_lcd.lyc;	  // 0xFF45
-				case LCD_BGP:  return gb_lcd.bgp;	  // 0xFF47
-				case LCD_WY:   return gb_lcd.wy;	  // 0xFF4A
-				case LCD_WX:   return gb_lcd.wx;	  // 0xFF4B
+				case LCD_LCDC: gb_lcd.lcdc = val;	  // 0xFF40
+				case LCD_STAT: gb_lcd.stat = val;	  // 0xFF41
+				case LCD_SCY:  gb_lcd.scy = val;	  // 0xFF42
+				case LCD_SCX:  gb_lcd.scx = val;	  // 0xFF43
+				case LCD_LY:   gb_lcd.ly = val;		  // 0xFF44
+				case LCD_LYC:  gb_lcd.lyc = val;	  // 0xFF45
+				case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
+				case LCD_WY:   gb_lcd.wy = val;		  // 0xFF4A
+				case LCD_WX:   gb_lcd.wx = val;	      // 0xFF4B
 				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				// It's necessary to implement more written about the GPU.
 				}

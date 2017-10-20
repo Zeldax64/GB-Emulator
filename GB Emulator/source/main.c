@@ -87,10 +87,22 @@ void emulatorInit(void) {
 
 int16_t maxpcounter = -1;
 bool found = false;
-
+uint64_t turn = 0;
 int16_t emulateCycle(int16_t cycles) {
-	printf("--- Cycle: %d ---\n", cycles);
-	genReport(false, true); // Generate report
+	if (found) {
+		printf("-----------------\n");
+		printf("--- Cycle: %d / Turn: %d ---\n", cycles, turn);
+		genReport(false, true); // Generate report
+	}
+
+	if (cycles == 17476 && turn == 15) {
+		printf("Found!\n");
+		genReport(false, true);
+		found = true;
+	}
+	if (found) {
+		getchar();
+	}
 
 	CPU_cycle(); // Runs one cycle
 
@@ -100,18 +112,10 @@ int16_t emulateCycle(int16_t cycles) {
 	INT_doInt();
 	gb_cpu.m = 0;
 	/*if (gb_cpu.pc > maxpcounter) {
-	maxpcounter = gb_cpu.pc;
-	printf("Max PC: %x\n", maxpcounter);
+		maxpcounter = gb_cpu.pc;
+		printf("Max PC: %x\n", maxpcounter);
 	}*/
-	printf("-----------------\n");
 
-	if (gb_cpu.pc == 0x000c) {
-		found = true;
-		getchar();
-	}
-	if (found) {
-		getchar();
-	}
 
 	return cycles;
 }
@@ -119,10 +123,11 @@ int16_t emulateCycle(int16_t cycles) {
 int16_t cycles_this_update = 0;
 void emulateFrame(void) {
 	const int MAXCYCLES = 17477; // Machine Cycles
+	turn++;
 	while (cycles_this_update < MAXCYCLES) {
 		cycles_this_update = emulateCycle(cycles_this_update);
 	}
-	printf("LCD Render\n");
+	//printf("LCD Render\n");
 	//getchar();
 	LCD_renderScreen();
 	cycles_this_update -= MAXCYCLES;
@@ -137,7 +142,9 @@ int main(int argc, char *argv[]) {
 	//emulatorInit();
 	gb_cpu.pc = 0x0;
 	registers.pc = 0x0;
-	loadROM(filename);
+	loadROM("Tetris.gb");
+	loadROM("gbbios.gb");
+
 	//debugCycle();
 	
 	while (true)
