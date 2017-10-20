@@ -23,7 +23,7 @@ void CPU_cycle(void) {
 }
 
 void CB(void) {
-	(*CBinstructions[rdByte(gb_cpu.pc)])();
+	(*CBinstructions[rdByte(gb_cpu.pc + 1)])();
 }
 
 
@@ -1147,7 +1147,12 @@ void SWAPHLm() { // SWAP (HL)
 // BIT b, r functions. Each one represents a possibility to a bit and r
 void BITr(uint8_t bit, uint8_t reg) { // Bit b, r
 	CLEAR_N;
-	gb_cpu.f = (bit & reg) ? 0 : FLAGZ;
+	
+	if (bit & reg)
+		CLEAR_Z;
+	else
+		gb_cpu.f |= FLAGZ;
+
 	gb_cpu.f |= FLAGH;
 
 	gb_cpu.m += 2;
