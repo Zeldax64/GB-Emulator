@@ -49,8 +49,8 @@ void printMem(uint16_t pc) {
 void printLCDReg() {
 	printf("--- LCD Registers ---\n");
 	printf("LCDC: %2x    STAT: %2x\n", gb_lcd.lcdc, gb_lcd.stat);
-	printf("WX: %2x    WY: %2x\n", gb_lcd.wx, gb_lcd.wy);
-	printf("ly: %2x    lyc: %2x\n", gb_lcd.ly, gb_lcd.lyc);
+	printf("WX: %d    WY: %d\n", gb_lcd.wx, gb_lcd.wy);
+	printf("ly: %d    lyc: %d\n", gb_lcd.ly, gb_lcd.lyc);
 	printf("\n");
 }
 

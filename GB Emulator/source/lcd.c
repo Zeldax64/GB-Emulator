@@ -213,6 +213,9 @@ void LCD_renderTiles() {
 		uint8_t col = LCD_getColour(colour_num, gb_lcd.bgp);
 		
 		// Set pixel into buffer.
+		if (gb_lcd.ly >= 144)
+			return;
+
 		uint16_t pixel_pos = gb_lcd.ly * LCD_WIDTH + pixel;
 		gb_lcd.buffer[pixel_pos] = col;
 	}

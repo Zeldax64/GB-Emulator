@@ -87,15 +87,15 @@ void emulatorInit(void) {
 
 int16_t maxpcounter = -1;
 bool found = false;
-uint64_t turn = 0;
+uint64_t frame = 0;
 int16_t emulateCycle(int16_t cycles) {
 	if (found) {
 		printf("-----------------\n");
-		printf("--- Cycle: %d / Turn: %d ---\n", cycles, turn);
+		printf("--- Cycle: %d / frame: %d ---\n", cycles, frame);
 		genReport(false, true); // Generate report
 	}
 
-	if (cycles == 17476 && turn == 15) {
+	if (gb_cpu.pc == 0x100) {
 		printf("Found!\n");
 		genReport(false, true);
 		found = true;
@@ -111,10 +111,10 @@ int16_t emulateCycle(int16_t cycles) {
 	LCD_update(gb_cpu.m);
 	INT_doInt();
 	gb_cpu.m = 0;
-	/*if (gb_cpu.pc > maxpcounter) {
+	if (gb_cpu.pc > maxpcounter) {
 		maxpcounter = gb_cpu.pc;
 		printf("Max PC: %x\n", maxpcounter);
-	}*/
+	}
 
 
 	return cycles;
@@ -123,7 +123,7 @@ int16_t emulateCycle(int16_t cycles) {
 int16_t cycles_this_update = 0;
 void emulateFrame(void) {
 	const int MAXCYCLES = 17477; // Machine Cycles
-	turn++;
+	frame++;
 	while (cycles_this_update < MAXCYCLES) {
 		cycles_this_update = emulateCycle(cycles_this_update);
 	}
