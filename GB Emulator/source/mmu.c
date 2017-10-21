@@ -138,6 +138,9 @@ uint8_t rdByte(uint16_t addr) {
 			else if (gb_cpu.pc == 0x0100)
 				gb_mmu.inbios = 0;
 		}
+		else {
+			return gb_mmu.rom[addr];
+		}
 		// ROM 0
 		/* DIFERENTE*/
 		//return rom[addr];
@@ -162,14 +165,11 @@ uint8_t rdByte(uint16_t addr) {
 		// External RAM (8k)
 	case 0xA000:
 	case 0xB000:
-		return gb_mmu.eram[addr & MEM8K];
+		return gb_mmu.eram[gb_mmu.ramoffset + (addr & MEM8K)];
 
-		// Working RAM (8k)
+		// Working RAM shadow/echo (8k)
 	case 0xC000:
 	case 0xD000:
-		return gb_mmu.wram[addr & MEM8K];
-
-		// Working RAM shadow
 	case 0xE000:
 		return gb_mmu.wram[addr & MEM8K];
 
@@ -198,7 +198,12 @@ uint8_t rdByte(uint16_t addr) {
 			// OAM is 160 bytes (A0), remaining bytes read as 0
 
 		case 0x0E00:
-			return gb_mmu.oam[addr & 0xFF];
+			if ((addr & 0xFF) < 0xA0) {
+				return gb_mmu.oam[addr & 0xFF];
+			}
+			else {
+				return 0;
+			}
 
 			// Zero page
 		case 0x0F00:
@@ -250,11 +255,17 @@ void wrByte(uint16_t addr, uint8_t val) {
 			if ((val & 0xF) == 0xA) {
 				gb_mmu.enableERam = 1;
 			}
+			else {
+				gb_mmu.enableERam = 0;
+			}
 			break;
 		case 5:
 		case 6:
 			if ((val & 0xF) == 0xA && !testBit(addr, BIT4)) { // TestBit -> addr & 1000
 				gb_mmu.enableERam = 1;
+			}
+			else {
+				gb_mmu.enableERam = 0;
 			}
 
 		}
@@ -380,15 +391,15 @@ void wrByte(uint16_t addr, uint8_t val) {
 				case TIM_TMA:  gb_tim.tma = val;  break; // 0xFF06
 				case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
 				case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
-				case LCD_LCDC: gb_lcd.lcdc = val; break;	  // 0xFF40
-				case LCD_STAT: gb_lcd.stat = val; break;	  // 0xFF41
-				case LCD_SCY:  gb_lcd.scy = val; break;	  // 0xFF42
-				case LCD_SCX:  gb_lcd.scx = val; break;	  // 0xFF43
-				case LCD_LY:   gb_lcd.ly = 0; break;		  // 0xFF44
-				case LCD_LYC:  gb_lcd.lyc = val; break;	  // 0xFF45
-				case LCD_BGP:  gb_lcd.bgp = val; break;	  // 0xFF47
-				case LCD_WY:   gb_lcd.wy = val; break;		  // 0xFF4A
-				case LCD_WX:   gb_lcd.wx = val; break;	      // 0xFF4B
+				case LCD_LCDC: gb_lcd.lcdc = val;	  // 0xFF40
+				case LCD_STAT: gb_lcd.stat = val;	  // 0xFF41
+				case LCD_SCY:  gb_lcd.scy = val;	  // 0xFF42
+				case LCD_SCX:  gb_lcd.scx = val;	  // 0xFF43
+				case LCD_LY:   gb_lcd.ly = val;		  // 0xFF44
+				case LCD_LYC:  gb_lcd.lyc = val;	  // 0xFF45
+				case LCD_BGP:  gb_lcd.bgp = val;	  // 0xFF47
+				case LCD_WY:   gb_lcd.wy = val;		  // 0xFF4A
+				case LCD_WX:   gb_lcd.wx = val;	      // 0xFF4B
 				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				// It's necessary to implement more written about the GPU.
 				}
