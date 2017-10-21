@@ -138,41 +138,42 @@ uint8_t rdByte(uint16_t addr) {
 			else if (gb_cpu.pc == 0x0100)
 				gb_mmu.inbios = 0;
 		}
+		else {
+			return gb_mmu.rom[addr];
+		}
 		// ROM 0
 		/* DIFERENTE*/
 		//return rom[addr];
+	break;
 
 	case 0x1000:
 	case 0x2000:
 	case 0x3000:
 		return gb_mmu.rom[addr];
-
+	break;
 		// ROM 1 (Unbanked) (16k)
 	case 0x4000:
 	case 0x5000:
 	case 0x6000:
 	case 0x7000:
 		return gb_mmu.rom[addr];
-
+	break;
 		// Graphics: VRAM (8k)
 	case 0x8000:
 	case 0x9000:
 		return gb_mmu.vram[addr & MEM8K];
-
+	break;
 		// External RAM (8k)
 	case 0xA000:
 	case 0xB000:
-		return gb_mmu.eram[addr & MEM8K];
+		return gb_mmu.eram[gb_mmu.ramoffset + (addr & MEM8K)];
 
-		// Working RAM (8k)
+		// Working RAM shadow/echo (8k)
 	case 0xC000:
 	case 0xD000:
-		return gb_mmu.wram[addr & MEM8K];
-
-		// Working RAM shadow
 	case 0xE000:
 		return gb_mmu.wram[addr & MEM8K];
-
+	break;
 		// Working RAM shadow, I/O, Zero Page RAM
 	case 0xF000:
 		switch (addr & 0x0F00) {
@@ -182,7 +183,7 @@ uint8_t rdByte(uint16_t addr) {
 		case 0x0800: case 0x0900: case 0x0A00: case 0x0B00:
 		case 0x0C00: case 0x0D00:
 			return gb_mmu.wram[addr & MEM8K];
-
+		break;
 			// Graphics: object attribute memory (OAM)
 			// OAM is 160 bytes, remaining bytes read as 0
 			/*CHANGING NOTE*/
@@ -198,8 +199,13 @@ uint8_t rdByte(uint16_t addr) {
 			// OAM is 160 bytes (A0), remaining bytes read as 0
 
 		case 0x0E00:
-			return gb_mmu.oam[addr & 0xFF];
-
+			if ((addr & 0xFF) < 0xA0) {
+				return gb_mmu.oam[addr & 0xFF];
+			}
+			else {
+				return 0;
+			}
+		break;
 			// Zero page
 		case 0x0F00:
 			if (addr == 0xFFFF) {
@@ -230,6 +236,7 @@ uint8_t rdByte(uint16_t addr) {
 				}
 				return 0;
 			}
+		break;
 		}
 	}
 }
@@ -250,15 +257,22 @@ void wrByte(uint16_t addr, uint8_t val) {
 			if ((val & 0xF) == 0xA) {
 				gb_mmu.enableERam = 1;
 			}
-			break;
+			else {
+				gb_mmu.enableERam = 0;
+			}
+		break;
 		case 5:
 		case 6:
 			if ((val & 0xF) == 0xA && !testBit(addr, BIT4)) { // TestBit -> addr & 1000
 				gb_mmu.enableERam = 1;
 			}
-
-		}
+			else {
+				gb_mmu.enableERam = 0;
+			}
 		break;
+		}
+	break;
+
 	//Change the ROM Bank
 	case 0x2000:
 	case 0x3000:
@@ -284,7 +298,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 			swapROM();
 			break;
 		}
-		break;
+	break;
 
 	case 0x4000:
 	case 0x5000:
@@ -306,9 +320,9 @@ void wrByte(uint16_t addr, uint8_t val) {
 				gb_mmu.romoffset = gb_mmu.rombank * 0x4000;
 				swapROM();
 			}
-			break;
-		}
 		break;
+		}
+	break;
 	//Change mode (Just for MBC1)
 	case 0x6000:
 	case 0x7000:
@@ -318,9 +332,9 @@ void wrByte(uint16_t addr, uint8_t val) {
 		case 3:
 			val = val & 0x1;
 			gb_mmu.mode = val;
-			break;
-		}
 		break;
+		}
+	break;
 
 		// Video RAM
 	case 0x8000:
@@ -328,7 +342,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 		gb_mmu.vram[addr & 0x1FFF] = val;
 		//updatetile(addr & 0x1FFF, val); // GPU
 		//GPU is necessary!!
-		break;
+	break;
 
 		// External RAM
 	case 0xA000:
@@ -336,14 +350,14 @@ void wrByte(uint16_t addr, uint8_t val) {
 		if (gb_mmu.enableERam){
 			gb_mmu.eram[gb_mmu.ramoffset + (addr & 0x1FFF)] = val;
 		}
-		break;
+	break;
 
 		// Internal RAM
 	case 0xC000:
 	case 0xD000:
 	case 0xE000:
 		gb_mmu.wram[addr & 0x1FFF] = val;
-		break;
+	break;
 
 	case 0xF000:
 		switch (addr & 0x0F00) {
@@ -352,7 +366,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 		case 0x800: case 0x900: case 0xA00: case 0xB00:
 		case 0xC00: case 0xD00:
 			gb_mmu.wram[addr & 0x1FFF] = val;
-			break;
+		break;
 
 		//Sprite Attribute Table
 		// OAM
@@ -361,7 +375,7 @@ void wrByte(uint16_t addr, uint8_t val) {
 				gb_mmu.oam[addr & 0xFF] = val;
 				//updateoam(addr, val); // GPU
 			}
-			break;
+		break;
 
 			// Zeropage RAM, I/O, interrupts
 		case 0xF00:
@@ -381,18 +395,19 @@ void wrByte(uint16_t addr, uint8_t val) {
 				case TIM_TMC:  gb_tim.tmc = val;  break; // 0xFF07
 				case INT_REQ:  gb_int.int_req = val; break;  // 0xFF0F
 				case LCD_LCDC: gb_lcd.lcdc = val; break;	  // 0xFF40
-				case LCD_STAT: gb_lcd.stat = val; break;	  // 0xFF41
+				case LCD_STAT: gb_lcd.stat = val; break;  // 0xFF41
 				case LCD_SCY:  gb_lcd.scy = val; break;	  // 0xFF42
 				case LCD_SCX:  gb_lcd.scx = val; break;	  // 0xFF43
-				case LCD_LY:   gb_lcd.ly = 0; break;		  // 0xFF44
+				case LCD_LY:   gb_lcd.ly = val; break;	  // 0xFF44
 				case LCD_LYC:  gb_lcd.lyc = val; break;	  // 0xFF45
 				case LCD_BGP:  gb_lcd.bgp = val; break;	  // 0xFF47
-				case LCD_WY:   gb_lcd.wy = val; break;		  // 0xFF4A
-				case LCD_WX:   gb_lcd.wx = val; break;	      // 0xFF4B
+				case LCD_WY:   gb_lcd.wy = val; break;	  // 0xFF4A
+				case LCD_WX:   gb_lcd.wx = val; break;	  // 0xFF4B
 				case INT_ENA:  gb_int.int_ena = val;  break; // 0xFFFF
 				// It's necessary to implement more written about the GPU.
 				}
 			}
+		break;
 		}
 	}
 }
@@ -410,33 +425,33 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 	case 0x2000:
 	case 0x3000:
 		return &gb_mmu.rom[addr];
-
+	break;
 		// ROM 1 (Unbanked) (16k)
 	case 0x4000:
 	case 0x5000:
 	case 0x6000:
 	case 0x7000:
 		return &gb_mmu.rom[addr];
-
+	break;
 		// Graphics: VRAM (8k)
 	case 0x8000:
 	case 0x9000:
 		return &gb_mmu.vram[addr & MEM8K];
-
+	break;
 		// External RAM (8k)
 	case 0xA000:
 	case 0xB000:
 		return &gb_mmu.eram[addr & MEM8K];
-
+	break;
 		// Working RAM (8k)
 	case 0xC000:
 	case 0xD000:
 		return &gb_mmu.wram[addr & MEM8K];
-
+	break;
 		// Working RAM shadow
 	case 0xE000:
 		return &gb_mmu.wram[addr & MEM8K];
-
+	break;
 		// Working RAM shadow, I/O, Zero Page RAM
 	case 0xF000:
 		switch (addr & 0x0F00) {
@@ -446,10 +461,10 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 		case 0x0800: case 0x0900: case 0x0A00: case 0x0B00:
 		case 0x0C00: case 0x0D00:
 			return &gb_mmu.wram[addr & MEM8K];
-		
+		break;
 		case 0x0E00:
 			return &gb_mmu.oam[addr & 0xFF];
-
+		break;
 			// Zero page
 		case 0x0F00:
 			if (addr == 0xFFFF) {
@@ -462,24 +477,26 @@ uint8_t * MMU_getAddr(uint16_t addr) {
 			else {
 				// I/O control handling
 				switch (addr & 0xFFFF) {
-				case TIM_DIVR: return &gb_tim.divr;	   // 0xFF04
-				case TIM_TIMA: return &gb_tim.tima;	   // 0xFF05
-				case TIM_TMA:  return &gb_tim.tma;	   // 0xFF06
-				case TIM_TMC:  return &gb_tim.tmc;	   // 0xFF07
-				case INT_REQ:  return &gb_int.int_req; // 0xFF0F
-				case LCD_LCDC: return &gb_lcd.lcdc;	   // 0xFF40
-				case LCD_STAT: return &gb_lcd.stat;	   // 0xFF41
-				case LCD_SCY:  return &gb_lcd.scy;	   // 0xFF42
-				case LCD_SCX:  return &gb_lcd.scx;	   // 0xFF43
-				case LCD_LY:   return &gb_lcd.ly;	   // 0xFF44
-				case LCD_LYC:  return &gb_lcd.lyc;	   // 0xFF45
-				case LCD_BGP:  return &gb_lcd.bgp;	   // 0xFF47
-				case LCD_WY:   return &gb_lcd.wy;	   // 0xFF4A
-				case LCD_WX:   return &gb_lcd.wx;	   // 0xFF4B
-				case INT_ENA:  return &gb_int.int_ena; // 0xFFFF
+				case TIM_DIVR: return &gb_tim.divr; break;	   // 0xFF04
+				case TIM_TIMA: return &gb_tim.tima; break;	   // 0xFF05
+				case TIM_TMA:  return &gb_tim.tma; break;	   // 0xFF06
+				case TIM_TMC:  return &gb_tim.tmc; break;	   // 0xFF07
+				case INT_REQ:  return &gb_int.int_req; break; // 0xFF0F
+				case LCD_LCDC: return &gb_lcd.lcdc; break;	   // 0xFF40
+				case LCD_STAT: return &gb_lcd.stat; break;	   // 0xFF41
+				case LCD_SCY:  return &gb_lcd.scy; break;	   // 0xFF42
+				case LCD_SCX:  return &gb_lcd.scx; break;	   // 0xFF43
+				case LCD_LY:   return &gb_lcd.ly; break;	   // 0xFF44
+				case LCD_LYC:  return &gb_lcd.lyc; break;	   // 0xFF45
+				case LCD_BGP:  return &gb_lcd.bgp; break;	   // 0xFF47
+				case LCD_WY:   return &gb_lcd.wy; break;	   // 0xFF4A
+				case LCD_WX:   return &gb_lcd.wx; break;	   // 0xFF4B
+				case INT_ENA:  return &gb_int.int_ena; break; // 0xFFFF
 				}
 			}
+		break;
 		}
+	break;
 	}
 }
 
